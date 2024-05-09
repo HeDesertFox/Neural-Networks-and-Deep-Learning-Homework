@@ -52,8 +52,9 @@ def train_model(model, dataloaders, device, criterion, optimizer, num_epochs=25,
             epoch_acc = running_corrects.double() / total_samples
 
             if writer:
-                writer.add_scalar(f'{phase} Loss', epoch_loss, epoch)
-                writer.add_scalar(f'{phase} Accuracy', epoch_acc, epoch)
+                # 使用相同的主标签但区分子标签
+                writer.add_scalar('Loss/' + phase, epoch_loss, epoch + 1)
+                writer.add_scalar('Accuracy/' + phase, epoch_acc, epoch + 1)
 
     return model
 
