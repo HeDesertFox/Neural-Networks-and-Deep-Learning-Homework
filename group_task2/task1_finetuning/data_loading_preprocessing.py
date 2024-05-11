@@ -3,7 +3,9 @@ import requests
 import tarfile
 from tqdm import tqdm
 from torch.utils.data import DataLoader, Subset
-from torchvision import datasets, transforms
+from torch.utils.data.dataloader import default_collate
+from torchvision.datasets import ImageFolder
+from torchvision import transforms
 import pandas as pd
 
 def download_dataset(url, data_dir):
@@ -64,6 +66,31 @@ def create_filename_to_split_mapping(data_dir):
 
     return filename_to_split
 
+
+
+# 定义变换
+base_transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+
+train_transform = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(15),
+        base_transform
+    ])
+
+def train_collate_fn(batch):
+    # 从批次中分别处理图像和标签
+    images, labels = zip(*[(train_transform(x), y) for x, y in batch])
+    # 使用 default_collate 来正确处理这些列表，形成批次
+    return default_collate(images), default_collate(labels)
+
+def val_collate_fn(batch):
+    images, labels = zip(*[(base_transform(x), y) for x, y in batch])
+    return default_collate(images), default_collate(labels)
+
 def load_data(data_dir, batch_size, download_url=None):
     """
     加载并预处理数据集。
@@ -77,14 +104,7 @@ def load_data(data_dir, batch_size, download_url=None):
     if download_url:
         download_dataset(download_url, data_dir)
 
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
-
-    full_dataset = datasets.ImageFolder(root=os.path.join(data_dir, 'CUB_200_2011', 'images'), transform=transform)
-
+    full_dataset = ImageFolder(root=os.path.join(data_dir, 'CUB_200_2011', 'images'))
     filename_to_split = create_filename_to_split_mapping(data_dir)
 
     train_indices = [i for i, (img_path, _) in enumerate(full_dataset.imgs)
@@ -95,7 +115,10 @@ def load_data(data_dir, batch_size, download_url=None):
     train_dataset = Subset(full_dataset, train_indices)
     val_dataset = Subset(full_dataset, val_indices)
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
+    # 在 DataLoader 中动态应用 transform
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4,
+                              collate_fn=train_collate_fn)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4,
+                            collate_fn=val_collate_fn)
 
     return train_loader, val_loader

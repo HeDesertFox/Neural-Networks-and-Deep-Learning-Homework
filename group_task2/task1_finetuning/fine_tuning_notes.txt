@@ -1,0 +1,40 @@
+Tuning hyperparameters for pretrained model...
+Training with lr=0.001, num_epochs=16
+Final validation accuracy: 0.6422
+New best accuracy: 0.6422 with lr=0.001 and num_epochs=16
+Training with lr=0.001, num_epochs=24
+Final validation accuracy: 0.6722
+New best accuracy: 0.6722 with lr=0.001 and num_epochs=24
+Training with lr=0.005, num_epochs=16
+Final validation accuracy: 0.7095
+New best accuracy: 0.7095 with lr=0.005 and num_epochs=16
+Training with lr=0.005, num_epochs=24
+Final validation accuracy: 0.7125
+New best accuracy: 0.7125 with lr=0.005 and num_epochs=24
+Training with lr=0.01, num_epochs=16
+Final validation accuracy: 0.7145
+New best accuracy: 0.7145 with lr=0.01 and num_epochs=16
+Training with lr=0.01, num_epochs=24
+Final validation accuracy: 0.7199
+New best accuracy: 0.7199 with lr=0.01 and num_epochs=24
+Training with lr=0.02, num_epochs=16
+Final validation accuracy: 0.7145
+Training with lr=0.02, num_epochs=24
+Final validation accuracy: 0.7258
+New best accuracy: 0.7258 with lr=0.02 and num_epochs=24
+Best Params: lr=0.02, num_epochs=24, Accuracy=0.7258
+Best hyperparameters for pretrained model: {'lr': 0.02, 'num_epochs': 24, 'accuracy': tensor(0.7258, device='cuda:0', dtype=torch.float64)}
+
+
+Tuning hyperparameters for pretrained model...
+Training with lr=0.005, num_epochs=20
+Final validation accuracy: 0.7164
+New best accuracy: 0.7164 with lr=0.005 and num_epochs=20
+Training with lr=0.01, num_epochs=20
+Final validation accuracy: 0.7245
+New best accuracy: 0.7245 with lr=0.01 and num_epochs=20
+Training with lr=0.02, num_epochs=20
+Final validation accuracy: 0.7370
+New best accuracy: 0.7370 with lr=0.02 and num_epochs=20
+Best Params: lr=0.02, num_epochs=20, Accuracy=0.7370
+Best hyperparameters for pretrained model: {'lr': 0.02, 'num_epochs': 20, 'accuracy': tensor(0.7370, device='cuda:0', dtype=torch.float64)}

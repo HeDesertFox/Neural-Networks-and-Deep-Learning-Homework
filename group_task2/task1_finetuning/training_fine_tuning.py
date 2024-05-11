@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from copy import deepcopy
 from torch.utils.tensorboard import SummaryWriter
+from model import initialize_model
 
 def train_model(model, dataloaders, device, criterion, optimizer, num_epochs=25, writer=None):
     """
@@ -71,6 +72,7 @@ def hyperparameter_tuning(model, dataloaders, device, num_epochs_list, lr_list, 
     返回:
         dict: 包含最佳学习率、轮次和验证准确率的字典。
     """
+
     criterion = nn.CrossEntropyLoss()
     best_acc = 0.0
     best_params = {'lr': None, 'num_epochs': None, 'accuracy': 0}
@@ -79,16 +81,18 @@ def hyperparameter_tuning(model, dataloaders, device, num_epochs_list, lr_list, 
         for num_epochs in num_epochs_list:
             print(f"Training with lr={lr}, num_epochs={num_epochs}")
 
+            model_copy = deepcopy(model).to(device)
+
             # Adjust learning rate based on whether the model is pretrained
             if use_pretrained:
                 optimizer = optim.SGD([
-                    {'params': model.fc.parameters(), 'lr': lr},
-                    {'params': (p for n, p in model.named_parameters() if 'fc' not in n), 'lr': lr / 10}
-                ], momentum=0.9)
+                    {'params': model_copy.fc.parameters(), 'lr': lr},
+                    {'params': (p for n, p in model_copy.named_parameters() if 'fc' not in n), 'lr': lr / 10}
+                ], momentum=0.9, weight_decay=1e-3)
             else:
-                optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
+                optimizer = optim.SGD(model_copy.parameters(), lr=lr, momentum=0.9, weight_decay=1e-3)
 
-            model_copy = deepcopy(model).to(device)
+
             trained_model = train_model(model_copy, dataloaders, device, criterion, optimizer, num_epochs)
             trained_model.eval()
 
