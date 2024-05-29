@@ -3,3 +3,5 @@
 /group_task2/task1_finetuning/runs
 /group_task2/task1_finetuning/attributes.txt
 /group_task2/task1_finetuning/draft.txt
+/group_task2/task2_finetuning/fasterRCNN/epoch_4.pth
+/group_task2/task2_finetuning/yolov3/epoch_6.pth
