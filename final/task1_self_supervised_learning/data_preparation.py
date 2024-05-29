@@ -1,28 +1,16 @@
 import os
-import tarfile
-import urllib.request
 import torch
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Dataset
 from PIL import Image
+from MLclf import MLclf  # 导入MLclf包
 
 # 下载Mini-ImageNet数据集的函数
 def download_mini_imagenet(data_dir):
-    url = "http://example.com/mini-imagenet.tar.gz"  # 替换为实际的Mini-ImageNet下载链接
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
-    tar_path = os.path.join(data_dir, "mini-imagenet.tar.gz")
-    if not os.path.exists(tar_path):
-        print("Downloading Mini-ImageNet dataset...")
-        urllib.request.urlretrieve(url, tar_path)
-        print("Download complete.")
-
-    # 解压缩
-    if not os.path.exists(os.path.join(data_dir, "mini-imagenet")):
-        print("Extracting Mini-ImageNet dataset...")
-        with tarfile.open(tar_path, "r:gz") as tar:
-            tar.extractall(path=data_dir)
-        print("Extraction complete.")
+    MLclf.miniimagenet_download(Download=True)
+    print("Mini-ImageNet dataset download complete.")
 
 # Mini-ImageNet自定义数据集
 class MiniImageNetDataset(Dataset):
