@@ -1,83 +1,76 @@
 import os
 import torch
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader, Dataset
-from PIL import Image
-from MLclf import MLclf  # 导入MLclf包
+import torchvision.transforms as transforms
+from torchvision.datasets import CIFAR100
+from torch.utils.data import DataLoader
+from MLclf import MLclf  # 导入MLclf包来比较方便的拿到数据集
 
-# 下载Mini-ImageNet数据集的函数
-def download_mini_imagenet(data_dir):
-    if not os.path.exists(data_dir):
-        os.makedirs(data_dir)
+# 数据集存储路径
+DATA_DIR = './data'
+
+def download_and_preprocess_mini_imagenet(data_dir=DATA_DIR):
+    """
+    下载并预处理 mini-ImageNet 数据集。
+    """
+    # 从 MLclf 包获取 mini-ImageNet 数据集
     MLclf.miniimagenet_download(Download=True)
-    print("Mini-ImageNet dataset download complete.")
 
-# Mini-ImageNet自定义数据集
-class MiniImageNetDataset(Dataset):
-    def __init__(self, root, transform=None):
-        self.root = root
-        self.transform = transform
-        self.data = []
-        self.labels = []
-        self._load_data()
-
-    def _load_data(self):
-        for label in os.listdir(self.root):
-            label_path = os.path.join(self.root, label)
-            if os.path.isdir(label_path):
-                for img_file in os.listdir(label_path):
-                    if img_file.endswith(".jpg"):
-                        self.data.append(os.path.join(label_path, img_file))
-                        self.labels.append(label)
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, idx):
-        img_path = self.data[idx]
-        label = self.labels[idx]
-        image = Image.open(img_path).convert("RGB")
-        if self.transform:
-            image = self.transform(image)
-        return image, label
-
-# CIFAR-100数据加载和预处理
-def get_cifar100_data(data_dir, batch_size=128, num_workers=4):
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))
-    ])
-
-    train_set = datasets.CIFAR100(root=data_dir, train=True, download=True, transform=transform)
-    test_set = datasets.CIFAR100(root=data_dir, train=False, download=True, transform=transform)
-
-    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=num_workers)
-
-    return train_loader, test_loader
-
-# 获取Mini-ImageNet数据加载器
-def get_mini_imagenet_data(data_dir, batch_size=128, num_workers=4):
+    # 将所有数据用于预训练
     transform = transforms.Compose([
         transforms.RandomResizedCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
-    dataset = MiniImageNetDataset(root=os.path.join(data_dir, "mini-imagenet"), transform=transform)
-    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+    train_dataset, val_dataset, test_dataset = MLclf.miniimagenet_clf_dataset(
+        ratio_train=0.8, ratio_val=0.1, seed_value=42, shuffle=True, transform=transform, save_clf_data=False
+    )
 
-    return data_loader
+    full_dataset = torch.utils.data.ConcatDataset([train_dataset, val_dataset, test_dataset])
+
+    return full_dataset
+
+def download_and_preprocess_cifar100(data_dir=DATA_DIR):
+    """
+    下载并预处理 CIFAR-100 数据集。
+    """
+    transform_train = transforms.Compose([
+        transforms.RandomCrop(32, padding=4),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5071, 0.4867, 0.4408], std=[0.2675, 0.2565, 0.2761]),
+    ])
+
+    transform_test = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5071, 0.4867, 0.4408], std=[0.2675, 0.2565, 0.2761]),
+    ])
+
+    train_dataset = CIFAR100(root=data_dir, train=True, download=True, transform=transform_train)
+    test_dataset = CIFAR100(root=data_dir, train=False, download=True, transform=transform_test)
+
+    return train_dataset, test_dataset
+
+def get_dataloaders(batch_size, data_dir=DATA_DIR):
+    """
+    获取数据加载器。
+    """
+    mini_imagenet_dataset = download_and_preprocess_mini_imagenet(data_dir)
+    train_cifar100, test_cifar100 = download_and_preprocess_cifar100(data_dir)
+
+    mini_imagenet_loader = DataLoader(mini_imagenet_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+    train_loader_cifar100 = DataLoader(train_cifar100, batch_size=batch_size, shuffle=True, num_workers=4)
+    test_loader_cifar100 = DataLoader(test_cifar100, batch_size=batch_size, shuffle=False, num_workers=4)
+
+    return mini_imagenet_loader, train_loader_cifar100, test_loader_cifar100
+
+
+
+
+
 
 if __name__ == "__main__":
-    data_dir = "./data"
-
-    # 下载并预处理Mini-ImageNet数据集
-    download_mini_imagenet(data_dir)
-    mini_imagenet_loader = get_mini_imagenet_data(data_dir)
-
-    # 下载并预处理CIFAR-100数据集
-    cifar100_train_loader, cifar100_test_loader = get_cifar100_data(data_dir)
-
-    print("Data preparation complete.")
+    batch_size = 128
+    mini_imagenet_loader, train_loader_cifar100, test_loader_cifar100 = get_dataloaders(batch_size)
+    print("Data loaders ready!")
