@@ -5,3 +5,11 @@
 /mid_term/task1_finetuning/draft.txt
 /mid_term/task2_finetuning/fasterRCNN/epoch_4.pth
 /mid_term/task2_finetuning/yolov3/epoch_6.pth
+
+/final/task1_self_supervised_learning/data
+/final/task1_self_supervised_learning/data/miniimagenet
+/final/task1_self_supervised_learning/data/tiny-imagenet-200
+/final/task1_self_supervised_learning/data/cifar-100-python
+/final/task1_self_supervised_learning/tiny_imagenet_loader.pth
+/final/task1_self_supervised_learning/train_loader_cifar100.pth
+/final/task1_self_supervised_learning/test_loader_cifar100.pth
