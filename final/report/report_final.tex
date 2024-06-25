@@ -23,6 +23,7 @@
 
 
 
+
 \usepackage[pdfborder={0 0 0},colorlinks=true,linkcolor=blue,CJKbookmarks=true, unicode=true]{hyperref}
 %若要用LATEX编译, 请用下面的命令替代上述命令:
 % \usepackage[dvipdfm,pdfborder={0 0 0},colorlinks=true,linkcolor=blue,CJKbookmarks=true]{hyperref}
@@ -40,6 +41,27 @@
 % Theorem style
 \newtheoremstyle{mystyle}{3pt}{3pt}{\kaishu}{0cm}{\bfseries}{}{1em}{}
 \theoremstyle{mystyle}
+\usepackage{listings}
+\lstset{
+    language = Python,
+    backgroundcolor = \color{yellow!10},    % 背景色：淡黄
+    basicstyle = \small\ttfamily,           % 基本样式 + 小号字体
+    rulesepcolor= \color{gray},             % 代码块边框颜色
+    breaklines = true,                  % 代码过长则换行
+    numbers = left,                     % 行号在左侧显示
+    numberstyle = \small,               % 行号字体
+    showstringspaces   =   false,
+    keywordstyle = \color{blue},            % 关键字颜色
+    commentstyle =\color{gray},        % 注释颜色
+    stringstyle = \color{red!100},          % 字符串颜色
+    frame = shadowbox,                  % 用（带影子效果）方框框住代码块
+    showspaces = false,                 % 不显示空格
+    columns = fixed,                    % 字间距固定
+    %escapeinside={<@}{@>}              % 特殊自定分隔符：<@可以自己加颜色@>
+    morekeywords = {with},                % 自加新的关键字（必须前后都是空格）
+    deletendkeywords = {compile}        % 删除内定关键字；删除错误标记的关键字用deletekeywords删！
+}
+
 
 \newtheorem{definition}{\hspace{2em}定义}[chapter]
 % 如果没有章, 只有节, 把上面的[chapter]改成[section]
@@ -55,9 +77,8 @@
 \def\thedefinition{\arabic{chapter}.\arabic{definition}.}
 
 % title - \zihao{1} for size requirement \bfseries for font family requirement
-\title{{\zihao{1}\bfseries 期中作业：微调与目标检测}}
-
-\author{何益涵 \quad 20307110032\\吕文韬 \quad }
+\title{{\zihao{1}\bfseries 期末作业：自监督训练、Transformer与三维重建}}
+\author{何益涵 \quad 20307110032\\吕文韬 \quad 23210180109}
 
 \date{}
 %%%%%%%%%%%%%%%%%%%导言区设置完毕
@@ -90,115 +111,168 @@
 % 撰写论文的摘要
 \renewcommand{\abstractname}{摘要: }
 \begin{abstract}
-     本项目的仓库地址为：
+     本项目的仓库地址为\href{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}{该超链接}\footnote{\href{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}}. 详见其中的文件夹\texttt{final}.其中包含自监督框架任务\texttt{task1\_self\_supervised\_learning}、Transformer任务\texttt{task2\_Transformer\_vs\_CNN}和三维重建任务\texttt{task3\_object\_reconstruction\_view\_synthesis}.
 
-     \url{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}。
-
-     详见其中的文件夹\texttt{group\_task2}。其中包含微调任务\texttt{task1\_finetuning}和目标检测任务\texttt{task2\_object\_detection}。
-
-     本项目提供了训练好的模型，详见\texttt{task1\_finetuning}中的\texttt{model\_pretrained\_state\_dict.pth}和\texttt{model\_random\_state\_dict.pth}文件，以及\texttt{task2\_object\_detection}中的。。。文件。也可以点击以下网盘链接：。。。\\
-
+     本项目提供了训练好的模型，详见\href{}{百度网盘}\footnote{提取码 }，若链接失效，也可以通过 Github Issue 联系作者.
 
 
 \end{abstract}
 
 
 
-\chapter{微调在ImageNet上预训练的卷积神经网络实现鸟类识别}
+\chapter{对比监督学习和自监督学习在图像分类任务上的性能表现}
 \section{任务描述}
 \begin{enumerate}
-\item 修改现有的CNN架构（如AlexNet，ResNet-18）用于鸟类识别，通过将其输出层大小设置为200以适应数据集中的类别数量，其余层使用在ImageNet上预训练得到的网络参数进行初始化；
-\item 在[CUB-200-2011]数据集上从零开始训练新的输出层，并对其余参数使用较小的学习率进行微调；
-\item 观察不同的超参数，如训练步数、学习率，及其不同组合带来的影响，并尽可能提升模型性能；
-\item 与仅使用CUB-200-2011数据集从随机初始化的网络参数开始训练得到的结果进行对比，观察预训练带来的提升。
+\item 实现任一自监督学习算法并使用该算法在自选的数据集上训练ResNet-18，随后在CIFAR-100数据集中使用Linear Classification Protocol对其性能进行评测；
+\item 将上述结果与在ImageNet数据集上采用监督学习训练得到的表征在相同的协议下进行对比，并比较二者相对于在CIFAR-100数据集上从零开始以监督学习方式进行训练所带来的提升；
+\item 尝试不同的超参数组合，探索自监督预训练数据集规模对性能的影响.
 \end{enumerate}
 
 \section{项目架构}
-此任务的所有文件在\texttt{task1\_finetuning}文件夹中，其中包含以下文件：
+
+
+
+
+
+\chapter{在 CIFAR-100 数据集上比较基于 Transformer 和 CNN 的图像分类模型}
+\section{任务描述}
 \begin{enumerate}
-\item \texttt{data\_loading\_preprocessing.py}文件：包含数据下载函数与预处理函数。
-\item \texttt{model.py}文件：包含网络构造函数。
-\item \texttt{training\_fine\_tuning.py}文件：包含训练和超参数调优函数。
-\item \texttt{main\_notebook.ipynb}文件：包含微调任务的全部流程，如数据加载、调参和训练可视化。
+\item 分别基于 CNN 和 Transformer 架构实现具有相近参数量的图像分类网络；
+\item 在 CIFAR-100 数据集上采用相同的训练策略对二者进行训练，其中数据增强策略中应包含 CutMix；
+\item 尝试不同的超参数组合，尽可能提升各架构在CIFAR-100上的性能以进行合理的比较。
+\end{enumerate}
+
+
+\section{项目架构}
+此任务的所有文件在\texttt{task2\_Transformer\_vs\_CNN}文件夹中，其中包含以下文件：
+\begin{enumerate}
+\item \texttt{data\_preparation.py}文件：包含数据下载函数与预处理函数，其中包含 Cutmix 的实现.
+\item \texttt{model.py}文件：包含 Resnet 和 ViT 的模型构造函数.
+\item \texttt{training.py}文件：包含训练和超参数调优函数.
+\item \texttt{test\_notebook.ipynb}文件：包含 Transformer 架构和 CNN 架构的对比任务的全部流程，如数据加载、调参和训练可视化.
 \end{enumerate}
 
 \section{实验设置}
 \subsection{数据增广}
-本实验根据CUB-200-2011中的\texttt{train\_test\_split.txt}文件对数据集进行划分，形成训练集和验证集。在数据预处理中，对训练集的数据进行了图像增强，其中包括了随机水平翻转和随机旋转。
+此项目的数据增广在常规图像变化的基础上增加了 Cutmix 增强方法。
+
+CutMix是一种数据增强技术，旨在提升网络的泛化性能。CutMix的主要思想是在训练图像之间剪切并粘贴图像块，同时按比例混合相应的标签。此方法有助于模型从更多样化的训练样本中学习，从而提高其鲁棒性和性能。
+
+CutMix的原理包括两个主要步骤：从一张图像中剪切出一个块并将其粘贴到另一张图像上，然后按比例调整两张图像的标签。具体来说，对于两张图像 $x_A$ 和 $x_B$ 及其对应的标签 $y_A$ 和 $y_B$，新的图像 $\tilde{x}$ 和标签 $\tilde{y}$ 的生成方式如下：
+\begin{equation}
+\tilde{x} = M \odot x_A + (1 - M) \odot x_B
+\end{equation}
+\begin{equation}
+\tilde{y} = \lambda y_A + (1 - \lambda) y_B
+\end{equation}
+其中，$M$ 是一个二进制掩码，表示图像块的应用位置，$\odot$ 表示元素级乘法，$\lambda \in [0, 1]$ 是表示原始图像保留比例的随机变量，通常从Beta分布中采样。
+
+CutMix已被证明能通过以下几方面增强深度学习模型的性能：
+\begin{itemize}
+    \item 提高泛化性能：通过使模型暴露于更广泛的图像变体，CutMix有助于防止过拟合，从而提高在未见数据上的泛化性能。
+    \item 正则化：该技术类似于dropout，通过引入随机性防止模型过度依赖特定特征，起到正则化的作用。
+    \item 标签平滑：标签混合有助于模型学习更柔和的标签，这对于分类任务中类间界限不明确的情况尤为有益。
+\end{itemize}
+实验证明，与传统的数据增强技术相比，使用CutMix训练的模型在准确率和对抗攻击的鲁棒性方面表现更佳。
+
+CutMix的实现包括以下步骤：
+\begin{enumerate}
+    \item 随机选择两张图像：从训练集中选择两张图像 $x_A$ 和 $x_B$ 及其对应的标签 $y_A$ 和 $y_B$。
+    \item 生成二进制掩码：通过在第一张图像中选择一个随机矩形区域，并将该区域对应的第二张图像的部分设为零，创建一个二进制掩码 $M$。
+    \item 应用CutMix：使用二进制掩码组合两张图像，创建新的训练样本。根据掩码区域的面积按比例调整标签。
+    \item 更新训练数据：使用新的图像和标签作为训练过程的一部分。
+\end{enumerate}
+
+在本项目的实现中，函数 \texttt{rand\_bbox} 用于生成随机边界框，而 \texttt{cutmix} 函数则将 CutMix 增强应用于一批图像。在训练函数每次载入小批量数据时，我们调用\texttt{cutmix} 函数。
+
 
 \subsection{模型选择}
-此项目的模型构建函数可以生成两种 CNN 架构：Alexnet 和 ResNet-18，并且可以选择采用Imagenet预训练的参数初始化或随机初始化。生成的模型的最后一层被替换为输出维数为200的全连接层以适应本任务的要求。
+本项目采用的CNN架构是 resnet 架构，具体采用了 resnet18 架构，也可以改为更大的 resnet 架构。
 
-为了实现更高的模型性能，本实验采用 ResNet-18 架构，使用者可以在模型构造函数中输入参数\texttt{"alexnet"}将模型改为 Alexnet。
+本项目采用的 Transformer 架构是经典的 ViT(Vision Transformer) 架构：
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.55]{ViT.png}
+    \caption{ViT 架构}
+    % \label{fig:fine}
+\end{figure}
+ViT 是一种将 Transformer 应用于图像分类任务的新型架构。Transformer 最初在自然语言处理（NLP）任务中取得了巨大成功，ViT则将其应用于计算机视觉领域，通过将图像划分为一系列图像块（patch），并将这些图像块视为序列数据进行处理。ViT 在许多图像分类任务上表现出色，特别是在大型数据集上。
+
+ViT 的核心思想是将图像分割成固定大小的图像块，然后将这些图像块展平并嵌入到更高维度的向量空间中。每个图像块通过线性变换被映射为一个特征向量，这些特征向量连同位置编码一起作为 Transformer 编码器的输入。
+
+具体步骤如下：
+\begin{enumerate}
+    \item 图像分割：将输入图像 $x \in \mathbb{R}^{H \times W \times C}$ 划分为 $N$ 个不重叠的图像块，每个图像块的大小为 $P \times P$，因此 $N = \frac{HW}{P^2}$。
+    \item 图像块展平和嵌入：将每个图像块展平并通过线性变换映射到$d$维特征向量，得到 $z_0 \in \mathbb{R}^{N \times d}$。
+    \item 位置编码：为每个图像块添加位置编码，以保留空间位置信息，位置编码与特征向量相加形成最终输入 $z_0 + E_{pos}$。
+    \item Transformer 编码器：将上述输入序列传递给标准的 Transformer 编码器，编码器由多层自注意力机制和前馈神经网络组成。
+    \item 分类：使用分类标记（class token）作为输入序列的一部分，通过 Transformer 编码器的输出进行图像分类。
+\end{enumerate}
+ViT 在大型数据集上的表现优异，并且在参数数量相近的情况下，能够比传统卷积神经网络取得更好的性能。其主要优势包括：
+\begin{itemize}
+    \item 灵活性：ViT 能够处理不同分辨率和大小的图像，只需调整图像块的大小即可。
+    \item 全局信息：自注意力机制能够捕捉图像中的全局信息，而不是局限于局部感受野。
+    \item 可扩展性：ViT 能够轻松扩展到更大的模型尺寸和更多的参数，从而进一步提高性能。
+\end{itemize}
+然而，ViT的一个主要挑战是在小型数据集上容易过拟合，因此在使用 ViT 时，通常需要预训练模型或更强的数据增强技术（如 Cutmix）。
+
+\subsection{模型参数量估计}
+
 
 \subsection{优化器设置}
-本实验的优化器均选择 SGD 优化器，在所有实验中都采用0.9的动量以加速收敛，采用1e-3的权重衰退缓解过拟合。
-
-在后续的调参和训练过程中，预训练模型的学习率在最后一层都正常设置，其余层的学习率都除$10$。
+两种架构的优化器都选择 Adam 优化器。除学习率和权重衰退以外，其余参数都为默认参数。
 
 
 \section{调参结果}
-本实验调节两个参数以尽可能提高模型性能：学习率(\texttt{lr})和训练轮数(\texttt{epoch})。
+本实验调节两个参数以尽可能提高模型性能：学习率 \texttt{lr} 和权重衰退 \texttt{weight\_decay}.
 
-总体来说，增加训练轮数不会减少验证集上的准确率。这是因为 ResNet-18 的表现力足够强，一般可以在训练集上将精度提升到接近$100\%$，此时梯度几乎为零，因此最终验证集精度不会因为训练过久而下降。
+经过多轮调参，最终确定 resnet18 的 \texttt{lr} 为1e-3，\texttt{weight\_decay} 为0. ViT 的 \texttt{lr} 为4e-4，\texttt{weight\_decay} 为1e-5.
 
-经过若干次调参，预训练模型的最后一次调参的参数列表定为 \texttt{lr}: \{0.5e-3, 1e-3, 2e-3\}, \texttt{epoch}: 20。最优参数为 \texttt{lr} = 2e-3，\texttt{epoch} = 20。
 
-实验表明，在这三种学习率之下，精度都比较接近，略高于$70\%$，其中\texttt{lr} = 2e-3时的表现略好。
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[scale=0.7]{fine.png}
+%     \caption{最后一次调参结果}
+%     \label{fig:fine}
+% \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.7]{fine.png}
-    \caption{最后一次调参结果}
-    \label{fig:fine}
-\end{figure}
 
-随机初始化模型也可以做调参。本实验中随机初始化模型采用和预训练模型一样的参数，保证比较的公平性。
 
 
 
 \section{实验结果}
 \subsection{数据分析}
-以下图片中，\textcolor{orange}{橙线}都是\textcolor{orange}{预训练模型}的数据曲线，\textcolor{blue}{蓝线}都是\textcolor{blue}{随机初始化模型}的数据曲线。完整的数据文件在文件夹\texttt{run}中。
+以下图片中，\textcolor{orange}{橙线}都是 \textcolor{orange}{resnet18 网络}的数据曲线，\textcolor{blue}{蓝线}都是 \textcolor{blue}{ViT 网络}的数据曲线.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.75]{acc.png}
+    \includegraphics[scale=0.75]{transformer_acc.png}
     \caption{准确率对比}
-    \label{fig:acc}
+    % \label{fig:acc}
 \end{figure}
-
-预训练模型的训练准确率迅速上升，并且在初期就已经接近$1$，这表明模型能够很好地学习训练数据。准确率接近1通常表明模型对训练数据的拟合非常好。随机初始化模型的训练准确率相比之下增长较慢，最终也没有接近$1$，这可能意味着模型学习较慢，或者是模型容量不足以完全学习数据。
-
-预训练模型的验证准确率也很快上升并保持在较高水平，这说明预训练模型在未见数据上也具有很好的泛化能力。验证准确率的高稳定性同时也表明模型没有出现显著的过拟合。随机初始化模型的验证准确率虽有所提高，但整体上显著低于预训练模型，这表明其泛化能力较弱。验证准确率的较低水平也表明该模型可能受限于其初始参数设置，未能充分利用训练数据。
-
-
+可以看出两个模型的准确率在训练的过程中不断上升，并且都没有饱和，理论上如果训练更长时间，两者都能获得更好的效果。训练初始阶段 resnet18 性能更好，约30个 epoch 左右被 ViT 超越。resnet18 的最终验证集准确率为57.88\%，ViT的最终验证集准确率为65.53\%.
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.75]{loss.png}
+    \includegraphics[scale=0.75]{transformer_loss.png}
     \caption{损失函数对比}
-    \label{fig:loss}
+    % \label{fig:loss}
 \end{figure}
 
-预训练模型的训练损失迅速下降并趋于平稳，这与高训练准确率一致，表明模型有效地减少了误差。随机初始化模型的训练损失下降较慢，结束时仍高于预训练模型的损失，这进一步证实了其学习效率较低。
 
-预训练模型的验证损失下降并保持较低，与高的验证准确率相符，说明模型在未见数据上的表现良好。验证损失的低水平和稳定性表明没有过拟合。随机初始化模型的验证损失相比之下较高并稍有波动，可能指示模型在未见数据上的性能不够稳定，这可能是由于模型参数初始化不佳或者模型结构不够优化。
 
 \subsection{结论}
-预训练模型明显优于随机初始化模型，无论是在训练过程还是在验证过程中。这表明利用预训练的权重可以显著提升模型的学习效率和泛化能力。
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.75]{ViT_vs_CNN.png}
+    \caption{数据集大小与模型性能的关系}
+    % \label{fig:loss}
+\end{figure}
 
-随机初始化模型可能需要更多的训练周期、更复杂的网络结构或者更多的调优来提高其性能。
-
-基于以上分析，使用预训练模型在类似的任务中是一个有效的策略，特别是当可用的训练数据量不足以从头训练一个复杂模型时。对于随机初始化的模型，可能需要探索额外的技术，如更深的网络、正则化策略或更精细的超参数调整，以提高其性能。
-
-
-
-\chapter{在VOC数据集上训练并测试目标检测模型Faster R-CNN和YOLO V3}
+\chapter{基于 NeRF 的物体重建和新视图合成3}
 \section{任务描述}
 \begin{enumerate}
-    \item 学习使用现成的目标检测框架——如mmdetection或detectron2——在VOC数据集上训练并测试目标检测模型Faster R-CNN和YOLO V3；
-    \item 挑选4张测试集中的图像，通过可视化对比训练好的Faster R-CNN第一阶段产生的proposal box和最终的预测结果。
-    \item 搜集三张不在VOC数据集内包含有VOC中类别物体的图像，分别可视化并比较两个在VOC数据集上训练好的模型在这三张图片上的检测结果（展示bounding box、类别标签和得分）
+\item 选取身边的物体拍摄多角度图片/视频，并使用COLMAP估计相机参数，随后使用现成的框架进行训练；
+\item 基于训练好的NeRF渲染环绕物体的视频，并在预留的测试图片上评价定量结果。
 \end{enumerate}
 
 
