@@ -129,10 +129,49 @@
 \end{enumerate}
 
 \section{项目架构}
+\begin{enumerate}
+    \item \texttt{data\_preparation.py}文件：
+    \item \texttt{model.py}文件：
+    \item \texttt{training.py}文件：
+    \item \texttt{test\_notebook.ipynb}文件：
+    \end{enumerate}
 
+\section{实验设置}
+\subsection{模型选择}
+本项目的自监督训练框架是 SimCLR，\href{http://proceedings.mlr.press/v119/chen20j/chen20j.pdf}{详见以下论文}。
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{simclr.png}
+    \caption{SimCLR 架构}
+    % \label{fig:fine}
+\end{figure}
+SimCLR 是一种用于自监督学习的框架，旨在学习高质量的视觉表示。其核心思想是通过对比学习来最大化正样本对之间的相似度，并最小化负样本对之间的相似度。SimCLR架构主要包括以下几个关键步骤：
+\begin{enumerate}
+\item 数据增强：SimCLR对每张输入图像应用一系列随机的数据增强操作（如裁剪、旋转、颜色抖动等），生成两种不同的视图。这些视图构成正样本对，而来自不同图像的视图构成负样本对。
 
+\item 编码器：使用深度神经网络（通常是ResNet）作为编码器，将每个增强后的图像视图映射到一个低维特征空间中。编码器的输出是一个固定长度的特征向量。
 
+\item 投影头（Projection Head）：为了计算对比损失，SimCLR在编码器之后引入了一个小型的 MLP 投影头，将编码器的输出特征向量进一步映射到另一个特征空间中。这个步骤有助于学习更好的表示。
 
+\item 对比损失（Contrastive Loss）：SimCLR使用一种称为 NT-Xent（Normalized Temperature-scaled Cross Entropy）对比损失函数。对于每对正样本对，损失函数鼓励它们在特征空间中彼此接近，同时使负样本对之间的距离尽可能远。
+\end{enumerate}
+
+整个 SimCLR 框架通过在一个大规模未标注数据集上进行训练，逐步优化编码器和投影头的参数。经过训练后，编码器能够提取有用的图像特征，这些特征可以用于下游任务（如分类、检测等）。
+
+SimCLR的一个显著优点是它仅依赖于数据增强和对比学习，无需任何人工标注的数据，从而有效利用大量未标注的数据进行训练。通过学习更加通用的特征表示，SimCLR 在许多视觉任务中表现出色，并成为自监督学习领域的重要方法之一。
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{simclr_code.png}
+    \caption{SimCLR 伪代码}
+    % \label{fig:fine}
+\end{figure}
+
+\subsection{数据集选择}
+
+\subsection{优化器设置}
+
+\section{实验结果}
+\subsection{数据分析}
 
 \chapter{在 CIFAR-100 数据集上比较基于 Transformer 和 CNN 的图像分类模型}
 \section{任务描述}
@@ -154,7 +193,7 @@
 
 \section{实验设置}
 \subsection{数据增广}
-此项目的数据增广在常规图像变化的基础上增加了 Cutmix 增强方法。
+此项目的数据增广在常规图像变化的基础上增加了 Cutmix 增强方法。\href{http://openaccess.thecvf.com/content_ICCV_2019/papers/Yun_CutMix_Regularization_Strategy_to_Train_Strong_Classifiers_With_Localizable_Features_ICCV_2019_paper.pdf}{详见以下论文}。
 
 CutMix是一种数据增强技术，旨在提升网络的泛化性能。CutMix的主要思想是在训练图像之间剪切并粘贴图像块，同时按比例混合相应的标签。此方法有助于模型从更多样化的训练样本中学习，从而提高其鲁棒性和性能。
 
@@ -166,6 +205,12 @@ CutMix的原理包括两个主要步骤：从一张图像中剪切出一个块�
 \tilde{y} = \lambda y_A + (1 - \lambda) y_B
 \end{equation}
 其中，$M$ 是一个二进制掩码，表示图像块的应用位置，$\odot$ 表示元素级乘法，$\lambda \in [0, 1]$ 是表示原始图像保留比例的随机变量，通常从Beta分布中采样。
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{cutmix.png}
+    \caption{Cutmix与其他混合增强方法的对比}
+    % \label{fig:acc}
+\end{figure}
 
 CutMix已被证明能通过以下几方面增强深度学习模型的性能：
 \begin{itemize}
@@ -189,7 +234,7 @@ CutMix的实现包括以下步骤：
 \subsection{模型选择}
 本项目采用的CNN架构是 resnet 架构，具体采用了 resnet18 架构，也可以改为更大的 resnet 架构。
 
-本项目采用的 Transformer 架构是经典的 ViT(Vision Transformer) 架构：
+本项目采用的 Transformer 架构是经典的 ViT(Vision Transformer) 架构。\href{https://arxiv.org/pdf/2010.11929.pdf?fbclid=IwAR1NafJDhZjkARvCswpV6kS9_hMa0ycvzwhlCb7cqAGwgzComFXcScxgA8o}{详见以下论文}：
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.55]{ViT.png}
@@ -229,17 +274,6 @@ ViT 在大型数据集上的表现优异，并且在参数数量相近的情况�
 经过多轮调参，最终确定 resnet18 的 \texttt{lr} 为1e-3，\texttt{weight\_decay} 为0. ViT 的 \texttt{lr} 为4e-4，\texttt{weight\_decay} 为1e-5.
 
 
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[scale=0.7]{fine.png}
-%     \caption{最后一次调参结果}
-%     \label{fig:fine}
-% \end{figure}
-
-
-
-
-
 \section{实验结果}
 \subsection{数据分析}
 以下图片中，\textcolor{orange}{橙线}都是 \textcolor{orange}{resnet18 网络}的数据曲线，\textcolor{blue}{蓝线}都是 \textcolor{blue}{ViT 网络}的数据曲线.
@@ -257,16 +291,23 @@ ViT 在大型数据集上的表现优异，并且在参数数量相近的情况�
     \caption{损失函数对比}
     % \label{fig:loss}
 \end{figure}
+两个模型的损失函数值也逐渐下降，初始时 resnet18 下降更快，但随后被 ViT 超越。
 
 
 
 \subsection{结论}
+以上实验结果一定程度上验证了 ViT 原论文中的结论，即 ViT 虽然在较小的数据集上性能不如 CNN 网络，但在更大的数据集上，ViT 的性能可以超越 CNN 架构。在我们的实验中，可以认为训练轮数较少等价于数据集较小，因此随着训练的进行，模型学习的数据量增多，ViT 的性能逐渐超越 resnet18.
+
+以下是 ViT 原论文中两种模型的性能对比，其中 BiT 是一种基于CNN的模型架构，灰色区域是其架构的性能范围，随着数据量的增加，ViT 的性能增加比BiT更多。
+
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.75]{ViT_vs_CNN.png}
     \caption{数据集大小与模型性能的关系}
     % \label{fig:loss}
 \end{figure}
+
+ViT 由于其较复杂的结构，在小数据集和短期训练中容易过拟合，导致其性能不如 resnet18。但随着训练数据量的增加，ViT 能够更好地利用其全局注意力机制，捕捉数据中的长距离依赖关系，从而逐渐提升其性能。在相同训练策略下，ViT 需要更多的训练时间和数据量来展现其优势。因此，在实际应用中，为了充分发挥 ViT 的潜力，通常需要结合大规模数据集或进行预训练。对于数据量有限的任务，resnet18 等传统 CNN 架构依然是有效的选择。而对于数据量充足的任务，ViT 则展现出更强的性能和泛化能力。
 
 \chapter{基于 NeRF 的物体重建和新视图合成3}
 \section{任务描述}
@@ -275,6 +316,11 @@ ViT 在大型数据集上的表现优异，并且在参数数量相近的情况�
 \item 基于训练好的NeRF渲染环绕物体的视频，并在预留的测试图片上评价定量结果。
 \end{enumerate}
 
+\section{实验设置}
+
+\section{项目架构}
+
+\section{实验结果}
 
 
 \end{document}
