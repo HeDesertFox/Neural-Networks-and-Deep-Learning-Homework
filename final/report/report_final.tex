@@ -30,6 +30,34 @@
 
 \usepackage{mathrsfs}
 \usepackage{longtable}
+\usepackage{appendix} % 引入附录包
+% 自定义附录标题格式
+\newcommand{\appchapter}[2]{%
+    \chapter*{附录~#1~~#2}%
+    \addcontentsline{toc}{chapter}{附录~#1~~#2}%
+    \phantomsection % 使得 hyperref 能够正确地引用到这个位置
+    \label{app:#1} % 使用 label 来标记这个章节
+}
+
+\usepackage{listings} % 引入 listings 包以支持代码高亮
+% 定义 Python 代码的样式
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily,
+    keywordstyle=\bfseries\color{blue},
+    commentstyle=\itshape\color{green!60!black},
+    stringstyle=\color{orange},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+}
+
+% 定义输出结果的样式
+\lstdefinestyle{output}{
+    basicstyle=\ttfamily,
+    frame=single,
+    breaklines=true,
+}
 
 %\usepackage{boondox-calo}
 %\usepackage{dutchcal}
@@ -189,6 +217,7 @@ SimCLR的一个显著优点是它仅依赖于数据增强和对比学习，无�
 \item \texttt{model.py}文件：包含 Resnet 和 ViT 的模型构造函数.
 \item \texttt{training.py}文件：包含训练和超参数调优函数.
 \item \texttt{test\_notebook.ipynb}文件：包含 Transformer 架构和 CNN 架构的对比任务的全部流程，如数据加载、调参和训练可视化.
+\item \texttt{para\_count.py}文件：精细统计模型每一层的参数量。
 \end{enumerate}
 
 \section{实验设置}
@@ -262,7 +291,11 @@ ViT 在大型数据集上的表现优异，并且在参数数量相近的情况�
 然而，ViT的一个主要挑战是在小型数据集上容易过拟合，因此在使用 ViT 时，通常需要预训练模型或更强的数据增强技术（如 Cutmix）。
 
 \subsection{模型参数量估计}
+ResNet的分类头输出维数是100，resnet18模型的参数量统计为：11227812。
 
+在我们的 ViT 模型中，\texttt{image\_size=32} 表示输入图像的尺寸为 32x32 像素；\texttt{patch\_size=4} 表示将图像划分为 4x4 像素的 patch，因此一个 32x32 的图像将被划分为 64 个 patch；\texttt{num\_classes=100} 表示模型需要进行100类分类；\texttt{dim=192}表示每个patch嵌入到一个192维的向量空间；\texttt{depth=25}表示模型包含25层Transformer编码器块；\texttt{heads=6}表示每个自注意力层包含6个独立的注意力头；\texttt{mlp\_dim=384}表示前馈神经网络的隐藏层维度为384。ViT 模型的参数统计为：11139844.
+
+更细致的统计见附录A。
 
 \subsection{优化器设置}
 两种架构的优化器都选择 Adam 优化器。除学习率和权重衰退以外，其余参数都为默认参数。
@@ -316,11 +349,386 @@ ViT 由于其较复杂的结构，在小数据集和短期训练中容易过拟�
 \item 基于训练好的NeRF渲染环绕物体的视频，并在预留的测试图片上评价定量结果。
 \end{enumerate}
 
+\section{项目架构}
+
+
 \section{实验设置}
 
-\section{项目架构}
+
 
 \section{实验结果}
 
+\newpage
+% 附录开始
+\begin{appendices}
+    \appchapter{A}{ResNet18 和 ViT 的模型参数量精细统计}
+可以运行\texttt{task2\_Transformer\_vs\_CNN}文件夹中的\texttt{para\_count.py}文件来统计模型参数。以下是统计结果：
+\small{
+\begin{lstlisting}[style=output]
+ResNet-18 Architecture and Parameters:
+Layer                                    Shape              Params
+==================================================================
+conv1.weight                             [64, 3, 7, 7]      9408
+bn1.weight                               [64]               64
+bn1.bias                                 [64]               64
+layer1.0.conv1.weight                    [64, 64, 3, 3]     36864
+layer1.0.bn1.weight                      [64]               64
+layer1.0.bn1.bias                        [64]               64
+layer1.0.conv2.weight                    [64, 64, 3, 3]     36864
+layer1.0.bn2.weight                      [64]               64
+layer1.0.bn2.bias                        [64]               64
+layer1.1.conv1.weight                    [64, 64, 3, 3]     36864
+layer1.1.bn1.weight                      [64]               64
+layer1.1.bn1.bias                        [64]               64
+layer1.1.conv2.weight                    [64, 64, 3, 3]     36864
+layer1.1.bn2.weight                      [64]               64
+layer1.1.bn2.bias                        [64]               64
+layer2.0.conv1.weight                    [128, 64, 3, 3]    73728
+layer2.0.bn1.weight                      [128]              128
+layer2.0.bn1.bias                        [128]              128
+layer2.0.conv2.weight                    [128, 128, 3, 3]   147456
+layer2.0.bn2.weight                      [128]              128
+layer2.0.bn2.bias                        [128]              128
+layer2.0.downsample.0.weight             [128, 64, 1, 1]    8192
+layer2.0.downsample.1.weight             [128]              128
+layer2.0.downsample.1.bias               [128]              128
+layer2.1.conv1.weight                    [128, 128, 3, 3]   147456
+layer2.1.bn1.weight                      [128]              128
+layer2.1.bn1.bias                        [128]              128
+layer2.1.conv2.weight                    [128, 128, 3, 3]   147456
+layer2.1.bn2.weight                      [128]              128
+layer2.1.bn2.bias                        [128]              128
+layer3.0.conv1.weight                    [256, 128, 3, 3]   294912
+layer3.0.bn1.weight                      [256]              256
+layer3.0.bn1.bias                        [256]              256
+layer3.0.conv2.weight                    [256, 256, 3, 3]   589824
+layer3.0.bn2.weight                      [256]              256
+layer3.0.bn2.bias                        [256]              256
+layer3.0.downsample.0.weight             [256, 128, 1, 1]   32768
+layer3.0.downsample.1.weight             [256]              256
+layer3.0.downsample.1.bias               [256]              256
+layer3.1.conv1.weight                    [256, 256, 3, 3]   589824
+layer3.1.bn1.weight                      [256]              256
+layer3.1.bn1.bias                        [256]              256
+layer3.1.conv2.weight                    [256, 256, 3, 3]   589824
+layer3.1.bn2.weight                      [256]              256
+layer3.1.bn2.bias                        [256]              256
+layer4.0.conv1.weight                    [512, 256, 3, 3]   1179648
+layer4.0.bn1.weight                      [512]              512
+layer4.0.bn1.bias                        [512]              512
+layer4.0.conv2.weight                    [512, 512, 3, 3]   2359296
+layer4.0.bn2.weight                      [512]              512
+layer4.0.bn2.bias                        [512]              512
+layer4.0.downsample.0.weight             [512, 256, 1, 1]   131072
+layer4.0.downsample.1.weight             [512]              512
+layer4.0.downsample.1.bias               [512]              512
+layer4.1.conv1.weight                    [512, 512, 3, 3]   2359296
+layer4.1.bn1.weight                      [512]              512
+layer4.1.bn1.bias                        [512]              512
+layer4.1.conv2.weight                    [512, 512, 3, 3]   2359296
+layer4.1.bn2.weight                      [512]              512
+layer4.1.bn2.bias                        [512]              512
+fc.weight                                [100, 512]         51200
+fc.bias                                  [100]              100
+==================================================================
+Total Parameters: 11227812
+
+ViT Architecture and Parameters:
+Layer                                    Shape              Params
+==================================================================
+pos_embedding                            [1, 65, 192]       12480
+cls_token                                [1, 1, 192]        192
+to_patch_embedding.1.weight              [48]               48
+to_patch_embedding.1.bias                [48]               48
+to_patch_embedding.2.weight              [192, 48]          9216
+to_patch_embedding.2.bias                [192]              192
+to_patch_embedding.3.weight              [192]              192
+to_patch_embedding.3.bias                [192]              192
+transformer.norm.weight                  [192]              192
+transformer.norm.bias                    [192]              192
+transformer.layers.0.0.norm.weight       [192]              192
+transformer.layers.0.0.norm.bias         [192]              192
+transformer.layers.0.0.to_qkv.weight     [1152, 192]        221184
+transformer.layers.0.0.to_out.0.weight   [192, 384]         73728
+transformer.layers.0.0.to_out.0.bias     [192]              192
+transformer.layers.0.1.net.0.weight      [192]              192
+transformer.layers.0.1.net.0.bias        [192]              192
+transformer.layers.0.1.net.1.weight      [384, 192]         73728
+transformer.layers.0.1.net.1.bias        [384]              384
+transformer.layers.0.1.net.4.weight      [192, 384]         73728
+transformer.layers.0.1.net.4.bias        [192]              192
+transformer.layers.1.0.norm.weight       [192]              192
+transformer.layers.1.0.norm.bias         [192]              192
+transformer.layers.1.0.to_qkv.weight     [1152, 192]        221184
+transformer.layers.1.0.to_out.0.weight   [192, 384]         73728
+transformer.layers.1.0.to_out.0.bias     [192]              192
+transformer.layers.1.1.net.0.weight      [192]              192
+transformer.layers.1.1.net.0.bias        [192]              192
+transformer.layers.1.1.net.1.weight      [384, 192]         73728
+transformer.layers.1.1.net.1.bias        [384]              384
+transformer.layers.1.1.net.4.weight      [192, 384]         73728
+transformer.layers.1.1.net.4.bias        [192]              192
+transformer.layers.2.0.norm.weight       [192]              192
+transformer.layers.2.0.norm.bias         [192]              192
+transformer.layers.2.0.to_qkv.weight     [1152, 192]        221184
+transformer.layers.2.0.to_out.0.weight   [192, 384]         73728
+transformer.layers.2.0.to_out.0.bias     [192]              192
+transformer.layers.2.1.net.0.weight      [192]              192
+transformer.layers.2.1.net.0.bias        [192]              192
+transformer.layers.2.1.net.1.weight      [384, 192]         73728
+transformer.layers.2.1.net.1.bias        [384]              384
+transformer.layers.2.1.net.4.weight      [192, 384]         73728
+transformer.layers.2.1.net.4.bias        [192]              192
+transformer.layers.3.0.norm.weight       [192]              192
+transformer.layers.3.0.norm.bias         [192]              192
+transformer.layers.3.0.to_qkv.weight     [1152, 192]        221184
+transformer.layers.3.0.to_out.0.weight   [192, 384]         73728
+transformer.layers.3.0.to_out.0.bias     [192]              192
+transformer.layers.3.1.net.0.weight      [192]              192
+transformer.layers.3.1.net.0.bias        [192]              192
+transformer.layers.3.1.net.1.weight      [384, 192]         73728
+transformer.layers.3.1.net.1.bias        [384]              384
+transformer.layers.3.1.net.4.weight      [192, 384]         73728
+transformer.layers.3.1.net.4.bias        [192]              192
+transformer.layers.4.0.norm.weight       [192]              192
+transformer.layers.4.0.norm.bias         [192]              192
+transformer.layers.4.0.to_qkv.weight     [1152, 192]        221184
+transformer.layers.4.0.to_out.0.weight   [192, 384]         73728
+transformer.layers.4.0.to_out.0.bias     [192]              192
+transformer.layers.4.1.net.0.weight      [192]              192
+transformer.layers.4.1.net.0.bias        [192]              192
+transformer.layers.4.1.net.1.weight      [384, 192]         73728
+transformer.layers.4.1.net.1.bias        [384]              384
+transformer.layers.4.1.net.4.weight      [192, 384]         73728
+transformer.layers.4.1.net.4.bias        [192]              192
+transformer.layers.5.0.norm.weight       [192]              192
+transformer.layers.5.0.norm.bias         [192]              192
+transformer.layers.5.0.to_qkv.weight     [1152, 192]        221184
+transformer.layers.5.0.to_out.0.weight   [192, 384]         73728
+transformer.layers.5.0.to_out.0.bias     [192]              192
+transformer.layers.5.1.net.0.weight      [192]              192
+transformer.layers.5.1.net.0.bias        [192]              192
+transformer.layers.5.1.net.1.weight      [384, 192]         73728
+transformer.layers.5.1.net.1.bias        [384]              384
+transformer.layers.5.1.net.4.weight      [192, 384]         73728
+transformer.layers.5.1.net.4.bias        [192]              192
+transformer.layers.6.0.norm.weight       [192]              192
+transformer.layers.6.0.norm.bias         [192]              192
+transformer.layers.6.0.to_qkv.weight     [1152, 192]        221184
+transformer.layers.6.0.to_out.0.weight   [192, 384]         73728
+transformer.layers.6.0.to_out.0.bias     [192]              192
+transformer.layers.6.1.net.0.weight      [192]              192
+transformer.layers.6.1.net.0.bias        [192]              192
+transformer.layers.6.1.net.1.weight      [384, 192]         73728
+transformer.layers.6.1.net.1.bias        [384]              384
+transformer.layers.6.1.net.4.weight      [192, 384]         73728
+transformer.layers.6.1.net.4.bias        [192]              192
+transformer.layers.7.0.norm.weight       [192]              192
+transformer.layers.7.0.norm.bias         [192]              192
+transformer.layers.7.0.to_qkv.weight     [1152, 192]        221184
+transformer.layers.7.0.to_out.0.weight   [192, 384]         73728
+transformer.layers.7.0.to_out.0.bias     [192]              192
+transformer.layers.7.1.net.0.weight      [192]              192
+transformer.layers.7.1.net.0.bias        [192]              192
+transformer.layers.7.1.net.1.weight      [384, 192]         73728
+transformer.layers.7.1.net.1.bias        [384]              384
+transformer.layers.7.1.net.4.weight      [192, 384]         73728
+transformer.layers.7.1.net.4.bias        [192]              192
+transformer.layers.8.0.norm.weight       [192]              192
+transformer.layers.8.0.norm.bias         [192]              192
+transformer.layers.8.0.to_qkv.weight     [1152, 192]        221184
+transformer.layers.8.0.to_out.0.weight   [192, 384]         73728
+transformer.layers.8.0.to_out.0.bias     [192]              192
+transformer.layers.8.1.net.0.weight      [192]              192
+transformer.layers.8.1.net.0.bias        [192]              192
+transformer.layers.8.1.net.1.weight      [384, 192]         73728
+transformer.layers.8.1.net.1.bias        [384]              384
+transformer.layers.8.1.net.4.weight      [192, 384]         73728
+transformer.layers.8.1.net.4.bias        [192]              192
+transformer.layers.9.0.norm.weight       [192]              192
+transformer.layers.9.0.norm.bias         [192]              192
+transformer.layers.9.0.to_qkv.weight     [1152, 192]        221184
+transformer.layers.9.0.to_out.0.weight   [192, 384]         73728
+transformer.layers.9.0.to_out.0.bias     [192]              192
+transformer.layers.9.1.net.0.weight      [192]              192
+transformer.layers.9.1.net.0.bias        [192]              192
+transformer.layers.9.1.net.1.weight      [384, 192]         73728
+transformer.layers.9.1.net.1.bias        [384]              384
+transformer.layers.9.1.net.4.weight      [192, 384]         73728
+transformer.layers.9.1.net.4.bias        [192]              192
+transformer.layers.10.0.norm.weight      [192]              192
+transformer.layers.10.0.norm.bias        [192]              192
+transformer.layers.10.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.10.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.10.0.to_out.0.bias    [192]              192
+transformer.layers.10.1.net.0.weight     [192]              192
+transformer.layers.10.1.net.0.bias       [192]              192
+transformer.layers.10.1.net.1.weight     [384, 192]         73728
+transformer.layers.10.1.net.1.bias       [384]              384
+transformer.layers.10.1.net.4.weight     [192, 384]         73728
+transformer.layers.10.1.net.4.bias       [192]              192
+transformer.layers.11.0.norm.weight      [192]              192
+transformer.layers.11.0.norm.bias        [192]              192
+transformer.layers.11.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.11.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.11.0.to_out.0.bias    [192]              192
+transformer.layers.11.1.net.0.weight     [192]              192
+transformer.layers.11.1.net.0.bias       [192]              192
+transformer.layers.11.1.net.1.weight     [384, 192]         73728
+transformer.layers.11.1.net.1.bias       [384]              384
+transformer.layers.11.1.net.4.weight     [192, 384]         73728
+transformer.layers.11.1.net.4.bias       [192]              192
+transformer.layers.12.0.norm.weight      [192]              192
+transformer.layers.12.0.norm.bias        [192]              192
+transformer.layers.12.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.12.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.12.0.to_out.0.bias    [192]              192
+transformer.layers.12.1.net.0.weight     [192]              192
+transformer.layers.12.1.net.0.bias       [192]              192
+transformer.layers.12.1.net.1.weight     [384, 192]         73728
+transformer.layers.12.1.net.1.bias       [384]              384
+transformer.layers.12.1.net.4.weight     [192, 384]         73728
+transformer.layers.12.1.net.4.bias       [192]              192
+transformer.layers.13.0.norm.weight      [192]              192
+transformer.layers.13.0.norm.bias        [192]              192
+transformer.layers.13.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.13.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.13.0.to_out.0.bias    [192]              192
+transformer.layers.13.1.net.0.weight     [192]              192
+transformer.layers.13.1.net.0.bias       [192]              192
+transformer.layers.13.1.net.1.weight     [384, 192]         73728
+transformer.layers.13.1.net.1.bias       [384]              384
+transformer.layers.13.1.net.4.weight     [192, 384]         73728
+transformer.layers.13.1.net.4.bias       [192]              192
+transformer.layers.14.0.norm.weight      [192]              192
+transformer.layers.14.0.norm.bias        [192]              192
+transformer.layers.14.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.14.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.14.0.to_out.0.bias    [192]              192
+transformer.layers.14.1.net.0.weight     [192]              192
+transformer.layers.14.1.net.0.bias       [192]              192
+transformer.layers.14.1.net.1.weight     [384, 192]         73728
+transformer.layers.14.1.net.1.bias       [384]              384
+transformer.layers.14.1.net.4.weight     [192, 384]         73728
+transformer.layers.14.1.net.4.bias       [192]              192
+transformer.layers.15.0.norm.weight      [192]              192
+transformer.layers.15.0.norm.bias        [192]              192
+transformer.layers.15.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.15.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.15.0.to_out.0.bias    [192]              192
+transformer.layers.15.1.net.0.weight     [192]              192
+transformer.layers.15.1.net.0.bias       [192]              192
+transformer.layers.15.1.net.1.weight     [384, 192]         73728
+transformer.layers.15.1.net.1.bias       [384]              384
+transformer.layers.15.1.net.4.weight     [192, 384]         73728
+transformer.layers.15.1.net.4.bias       [192]              192
+transformer.layers.16.0.norm.weight      [192]              192
+transformer.layers.16.0.norm.bias        [192]              192
+transformer.layers.16.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.16.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.16.0.to_out.0.bias    [192]              192
+transformer.layers.16.1.net.0.weight     [192]              192
+transformer.layers.16.1.net.0.bias       [192]              192
+transformer.layers.16.1.net.1.weight     [384, 192]         73728
+transformer.layers.16.1.net.1.bias       [384]              384
+transformer.layers.16.1.net.4.weight     [192, 384]         73728
+transformer.layers.16.1.net.4.bias       [192]              192
+transformer.layers.17.0.norm.weight      [192]              192
+transformer.layers.17.0.norm.bias        [192]              192
+transformer.layers.17.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.17.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.17.0.to_out.0.bias    [192]              192
+transformer.layers.17.1.net.0.weight     [192]              192
+transformer.layers.17.1.net.0.bias       [192]              192
+transformer.layers.17.1.net.1.weight     [384, 192]         73728
+transformer.layers.17.1.net.1.bias       [384]              384
+transformer.layers.17.1.net.4.weight     [192, 384]         73728
+transformer.layers.17.1.net.4.bias       [192]              192
+transformer.layers.18.0.norm.weight      [192]              192
+transformer.layers.18.0.norm.bias        [192]              192
+transformer.layers.18.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.18.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.18.0.to_out.0.bias    [192]              192
+transformer.layers.18.1.net.0.weight     [192]              192
+transformer.layers.18.1.net.0.bias       [192]              192
+transformer.layers.18.1.net.1.weight     [384, 192]         73728
+transformer.layers.18.1.net.1.bias       [384]              384
+transformer.layers.18.1.net.4.weight     [192, 384]         73728
+transformer.layers.18.1.net.4.bias       [192]              192
+transformer.layers.19.0.norm.weight      [192]              192
+transformer.layers.19.0.norm.bias        [192]              192
+transformer.layers.19.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.19.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.19.0.to_out.0.bias    [192]              192
+transformer.layers.19.1.net.0.weight     [192]              192
+transformer.layers.19.1.net.0.bias       [192]              192
+transformer.layers.19.1.net.1.weight     [384, 192]         73728
+transformer.layers.19.1.net.1.bias       [384]              384
+transformer.layers.19.1.net.4.weight     [192, 384]         73728
+transformer.layers.19.1.net.4.bias       [192]              192
+transformer.layers.20.0.norm.weight      [192]              192
+transformer.layers.20.0.norm.bias        [192]              192
+transformer.layers.20.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.20.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.20.0.to_out.0.bias    [192]              192
+transformer.layers.20.1.net.0.weight     [192]              192
+transformer.layers.20.1.net.0.bias       [192]              192
+transformer.layers.20.1.net.1.weight     [384, 192]         73728
+transformer.layers.20.1.net.1.bias       [384]              384
+transformer.layers.20.1.net.4.weight     [192, 384]         73728
+transformer.layers.20.1.net.4.bias       [192]              192
+transformer.layers.21.0.norm.weight      [192]              192
+transformer.layers.21.0.norm.bias        [192]              192
+transformer.layers.21.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.21.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.21.0.to_out.0.bias    [192]              192
+transformer.layers.21.1.net.0.weight     [192]              192
+transformer.layers.21.1.net.0.bias       [192]              192
+transformer.layers.21.1.net.1.weight     [384, 192]         73728
+transformer.layers.21.1.net.1.bias       [384]              384
+transformer.layers.21.1.net.4.weight     [192, 384]         73728
+transformer.layers.21.1.net.4.bias       [192]              192
+transformer.layers.22.0.norm.weight      [192]              192
+transformer.layers.22.0.norm.bias        [192]              192
+transformer.layers.22.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.22.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.22.0.to_out.0.bias    [192]              192
+transformer.layers.22.1.net.0.weight     [192]              192
+transformer.layers.22.1.net.0.bias       [192]              192
+transformer.layers.22.1.net.1.weight     [384, 192]         73728
+transformer.layers.22.1.net.1.bias       [384]              384
+transformer.layers.22.1.net.4.weight     [192, 384]         73728
+transformer.layers.22.1.net.4.bias       [192]              192
+transformer.layers.23.0.norm.weight      [192]              192
+transformer.layers.23.0.norm.bias        [192]              192
+transformer.layers.23.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.23.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.23.0.to_out.0.bias    [192]              192
+transformer.layers.23.1.net.0.weight     [192]              192
+transformer.layers.23.1.net.0.bias       [192]              192
+transformer.layers.23.1.net.1.weight     [384, 192]         73728
+transformer.layers.23.1.net.1.bias       [384]              384
+transformer.layers.23.1.net.4.weight     [192, 384]         73728
+transformer.layers.23.1.net.4.bias       [192]              192
+transformer.layers.24.0.norm.weight      [192]              192
+transformer.layers.24.0.norm.bias        [192]              192
+transformer.layers.24.0.to_qkv.weight    [1152, 192]        221184
+transformer.layers.24.0.to_out.0.weight  [192, 384]         73728
+transformer.layers.24.0.to_out.0.bias    [192]              192
+transformer.layers.24.1.net.0.weight     [192]              192
+transformer.layers.24.1.net.0.bias       [192]              192
+transformer.layers.24.1.net.1.weight     [384, 192]         73728
+transformer.layers.24.1.net.1.bias       [384]              384
+transformer.layers.24.1.net.4.weight     [192, 384]         73728
+transformer.layers.24.1.net.4.bias       [192]              192
+mlp_head.weight                          [100, 192]         19200
+mlp_head.bias                            [100]              100
+==================================================================
+Total Parameters: 11139844
+\end{lstlisting}
+}
+
+
+\end{appendices}
 
 \end{document}
