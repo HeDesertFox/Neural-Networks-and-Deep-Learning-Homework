@@ -139,9 +139,9 @@
 % 撰写论文的摘要
 \renewcommand{\abstractname}{摘要: }
 \begin{abstract}
-     本项目的仓库地址为\href{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}{该超链接}\footnote{\href{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}}. 详见其中的文件夹\texttt{final}.其中包含自监督框架任务\texttt{task1\_self\_supervised\_learning}、Transformer任务\texttt{task2\_Transformer\_vs\_CNN}和三维重建任务\texttt{task3\_object\_reconstruction\_view\_synthesis}.
+     本项目的仓库地址为\href{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}{该超链接}\footnote{\href{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}}. 详见其中的文件夹\texttt{final}.其中包含任务1：自监督框架任务\texttt{task1\_self\_supervised\_learning}、任务2：Transformer任务\texttt{task2\_Transformer\_vs\_CNN}以及借助 NeRF 和 COLMAP完成的三维重建任务\texttt{task3\_object\_reconstruction\_view\_synthesis}.
 
-     本项目提供了训练好的模型，详见\href{}{百度网盘}\footnote{提取码 }，若链接失效，也可以通过 Github Issue 联系作者.
+     本项目提供了训练好的模型，详见\href{}{百度网盘}\footnote{链接：\href{https://pan.baidu.com/s/1P5qObkLj0eNHasfmEn_PVw?pwd=wwt1}{https://pan.baidu.com/s/1P5qObkLj0eNHasfmEn_PVw?pwd=wwt1} 提取码：wwt1}，若链接失效，也可以通过 Github Issue 联系作者.
 
 
 \end{abstract}
@@ -194,12 +194,50 @@ SimCLR的一个显著优点是它仅依赖于数据增强和对比学习，无�
     % \label{fig:fine}
 \end{figure}
 
-\subsection{数据集选择}
+\subsection{实验设置}
+\subsubsection{数据集}
+在本次期末作业的实验中，我们选择了 CIFAR-10 数据集和 STL-10 数据集来预训练 ResNet18，并在预训练好的 ResNet18 后加入二层 MLP 分类头，并在 CIFAR-100 数据集上进行了微调.
 
-\subsection{优化器设置}
+\subsubsection{优化器和超参数}
+本次实验使用 AdamW 做为优化器，学习率为 $0.0003$，设置批次大小为 512. 在 CIFAR10 数据集上，我们预训练了 90 个 epochs，在 STL10 数据集上，我们预训练了 70 个 epochs，得到了两个版本的 ResNet18.
+
+在训练中，我们的温度参数设置为 0.07，特征投射头的维度为 128.
+
+\subsubsection{数据增强}
+在本次实验中，我们选择了和论文中相同的数据增强方法来生成正样本对，我们对图像按照以下顺序进行数据增强：对图像进行随机裁剪：对图像进行随机裁剪、对图像进行随机色彩失真，对图像进行高斯模糊.
+
 
 \section{实验结果}
 \subsection{数据分析}
+
+我们比较了几组 ResNet18 在 CIFAR100 分类任务上的性能，详见下图：
+
+\begin{figure}[htpb!]
+    \centering
+    \includegraphics[width=1\linewidth]{finetune_accuracy.png}
+    \caption{不同预训练策略下的ResNet18在分裂任务上的性能比较}
+    \label{finetune_accuracy}
+\end{figure}
+
+上图的四个 ResNet18 曲线由上到下分别是在 ImageNet 上预训练的 ResNet18，在 CIFAR10 上使用 SImCLR 预训练的 ResNet18，在 STL10 上 使用 SImCLR 预训练的 ResNet18 和随机初始化的 ResNet18. 可以看到，预训练的模型在分类任务上微调时很快收敛，下图是微调的 loss 曲线：
+
+\begin{figure}[htpb!]
+    \centering
+    \includegraphics[width=1\linewidth]{fine-tune_loss.png}
+    \caption{微调任务的损失函数曲线}
+    \label{fig:enter-label}
+\end{figure}
+
+\subsection{结论}
+
+通过以上实验，我们发现使用自监督训练方法预训练得到的 ResNet18 相比于随机初始化的 ResNet18 在具体任务微调上具有更为显著的优势. 
+
+但同时，并非是预训练数据集越大越好，STL10 的数据集体量远大于 CIFAR10，但两个预训练得到的模型在 CIFAR100 分类任务上表现接近，甚至 CIFAR10 预训练得到的模型在某些 epochs 的评测中效果要好于 STL10，推测有以下两个可能的原因：
+
+\begin{enumerate}
+    \item SimCLR 的特征投射头设置较小，CIFAR10 的数据量已经达到模型承载极限.
+    \item SimCLR 损失函数存在优化空间.
+\end{enumerate}
 
 \chapter{在 CIFAR-100 数据集上比较基于 Transformer 和 CNN 的图像分类模型}
 \section{任务描述}
@@ -208,7 +246,6 @@ SimCLR的一个显著优点是它仅依赖于数据增强和对比学习，无�
 \item 在 CIFAR-100 数据集上采用相同的训练策略对二者进行训练，其中数据增强策略中应包含 CutMix；
 \item 尝试不同的超参数组合，尽可能提升各架构在CIFAR-100上的性能以进行合理的比较。
 \end{enumerate}
-
 
 \section{项目架构}
 此任务的所有文件在\texttt{task2\_Transformer\_vs\_CNN}文件夹中，其中包含以下文件：
@@ -350,14 +387,59 @@ ViT 由于其较复杂的结构，在小数据集和短期训练中容易过拟�
 \end{enumerate}
 
 \section{项目架构}
+本次实验使用 nerfstudio 完成了工程部分，选择的模型是 nerfacto，是 nerfstudio 的默认选项，关于模型和 nerfstudio 的架构细节，详见\href{https://arxiv.org/pdf/2302.04264}{此论文}.
+
+本次实验使用了一段 67s 的视频做为训练数据集，COLMAP 将视频划分为了 335 帧，其中 90\% 的数据被用作模型的训练，10\% 的数据被用作模型的测试.
 
 
 \section{实验设置}
+本次实验借助了架构 Nerf Studio，此框架提供了一键式训练一些现有 nerf 模型的环境. 实验的主要设置为：
+\begin{enumerate}
+    \item 优化器：采用 Adam 优化器，NeRF 的训练有三部分：相机参数优化、场和建议网络，这几部分的学习率中，后两个的学习率我们使得其线性下降，第一个学习率我们令其以 $t^{-1}$ 的速度下降，最低为 $1\times 10^{-4}$.
 
+    \item 我们训练了 100 个 epoch，每个 epoch 都使用了 4096 的 batch size，每 500 次迭代之后评估一张测试集的图片，25000 个迭代之后评估所有图片.
+\end{enumerate}
 
 
 \section{实验结果}
+本次实验的训练损失函数和测试集上的损失函数见下图：
+\begin{figure}[htpb!]
+    \centering
+    \includegraphics[width=1\linewidth]{nerfloss.png}
+    \caption{NeRFacto 训练损失函数}
+    \label{fig:enter-label}
+\end{figure}
 
+\begin{figure}[htpb!]
+    \centering
+    \includegraphics[width=1\linewidth]{eval_loss.png}
+    \caption{NeRFacto 测试损失函数}
+    \label{fig:enter-label}
+\end{figure}
+
+同时，我们还输出了在测试图像上的 PSNR，见下图：
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{psnr.png}
+    \caption{测试图片上的 PSNR}
+    \label{fig:enter-label}
+\end{figure}
+
+\subsection{结果的可视化}
+
+我们使用 NeRF 训练的结果重建了 3D 点云，并渲染了环绕物体的视频.
+
+我们选取的物体是一个可回收垃圾桶，其放置的环境在光华楼东主楼 14 楼的电梯间，3D点云重建的效果如下：
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{3drecon.png}
+    \caption{3D 重建的可视化}
+    \label{fig:enter-label}
+\end{figure}
+
+我们渲染得到的视频在电子文件中可用.
 \newpage
 % 附录开始
 \begin{appendices}
