@@ -7,17 +7,17 @@ from model import initialize_model
 
 def train_model(model, dataloaders, device, criterion, optimizer, num_epochs=25, writer=None):
     """
-    训练模型并在训练和验证阶段跟踪性能。
+    训练模型并在训练和验证阶段跟踪性能.
     参数:
-        model (torch.nn.Module): 要训练的模型。
-        dataloaders (dict): 包含' train '和' val '数据的数据加载器。
-        device (torch.device): 模型和数据应在哪个设备上运行。
-        criterion (callable): 用于计算损失的函数。
-        optimizer (torch.optim.Optimizer): 优化器。
-        num_epochs (int): 训练的总轮次。
-        writer (torch.utils.tensorboard.SummaryWriter, optional): 用于记录训练过程的TensorBoard writer。
+        model (torch.nn.Module): 要训练的模型.
+        dataloaders (dict): 包含' train '和' val '数据的数据加载器.
+        device (torch.device): 模型和数据应在哪个设备上运行.
+        criterion (callable): 用于计算损失的函数.
+        optimizer (torch.optim.Optimizer): 优化器.
+        num_epochs (int): 训练的总轮次.
+        writer (torch.utils.tensorboard.SummaryWriter, optional): 用于记录训练过程的TensorBoard writer.
     返回:
-        torch.nn.Module: 训练后的模型。
+        torch.nn.Module: 训练后的模型.
     """
     model.to(device)
     for epoch in range(num_epochs):
@@ -61,16 +61,16 @@ def train_model(model, dataloaders, device, criterion, optimizer, num_epochs=25,
 
 def hyperparameter_tuning(model, dataloaders, device, num_epochs_list, lr_list, use_pretrained=True):
     """
-    对模型进行超参数调整，以找到最佳的学习率和训练轮次。
+    对模型进行超参数调整, 以找到最佳的学习率和训练轮次.
     参数:
-        model (torch.nn.Module): 模型原型。
-        dataloaders (dict): 包含训练和验证数据的加载器。
-        device (torch.device): 设备信息。
-        num_epochs_list (list of int): 要尝试的训练轮次列表。
-        lr_list (list of float): 要尝试的学习率列表。
-        use_pretrained (bool): 模型是否使用预训练权重。
+        model (torch.nn.Module): 模型原型.
+        dataloaders (dict): 包含训练和验证数据的加载器.
+        device (torch.device): 设备信息.
+        num_epochs_list (list of int): 要尝试的训练轮次列表.
+        lr_list (list of float): 要尝试的学习率列表.
+        use_pretrained (bool): 模型是否使用预训练权重.
     返回:
-        dict: 包含最佳学习率、轮次和验证准确率的字典。
+        dict: 包含最佳学习率、轮次和验证准确率的字典.
     """
 
     criterion = nn.CrossEntropyLoss()

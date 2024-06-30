@@ -141,8 +141,7 @@
 \begin{abstract}
      本项目的仓库地址为\href{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}{该超链接}\footnote{\href{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}{https://github.com/HeDesertFox/Neural-Networks-and-Deep-Learning-Homework-Group-Tasks.git}}. 详见其中的文件夹\texttt{final}.其中包含任务1：自监督框架任务\texttt{task1\_self\_supervised\_learning}、任务2：Transformer任务\texttt{task2\_Transformer\_vs\_CNN}以及借助 NeRF 和 COLMAP完成的三维重建任务\texttt{task3\_object\_reconstruction\_view\_synthesis}.
 
-     本项目提供了训练好的模型，详见\href{}{百度网盘}\footnote{链接：\href{https://pan.baidu.com/s/1P5qObkLj0eNHasfmEn_PVw?pwd=wwt1}{https://pan.baidu.com/s/1P5qObkLj0eNHasfmEn_PVw?pwd=wwt1} 提取码：wwt1}，若链接失效，也可以通过 Github Issue 联系作者.
-
+     本项目提供了训练好的模型, 详见\href{https://pan.baidu.com/s/1P5qObkLj0eNHasfmEn_PVw?pwd=wwt1}{百度网盘}\footnote{链接：\url{https://pan.baidu.com/s/1P5qObkLj0eNHasfmEn_PVw?pwd=wwt1} 提取码：wwt1}, 若链接失效, 也可以通过 Github Issue 联系作者.
 
 \end{abstract}
 
@@ -151,9 +150,9 @@
 \chapter{对比监督学习和自监督学习在图像分类任务上的性能表现}
 \section{任务描述}
 \begin{enumerate}
-\item 实现任一自监督学习算法并使用该算法在自选的数据集上训练ResNet-18，随后在CIFAR-100数据集中使用Linear Classification Protocol对其性能进行评测；
-\item 将上述结果与在ImageNet数据集上采用监督学习训练得到的表征在相同的协议下进行对比，并比较二者相对于在CIFAR-100数据集上从零开始以监督学习方式进行训练所带来的提升；
-\item 尝试不同的超参数组合，探索自监督预训练数据集规模对性能的影响.
+\item 实现任一自监督学习算法并使用该算法在自选的数据集上训练ResNet-18, 随后在CIFAR-100数据集中使用Linear Classification Protocol对其性能进行评测；
+\item 将上述结果与在ImageNet数据集上采用监督学习训练得到的表征在相同的协议下进行对比, 并比较二者相对于在CIFAR-100数据集上从零开始以监督学习方式进行训练所带来的提升；
+\item 尝试不同的超参数组合, 探索自监督预训练数据集规模对性能的影响.
 \end{enumerate}
 
 \section{项目架构}
@@ -166,27 +165,27 @@
 
 \section{实验设置}
 \subsection{模型选择}
-本项目的自监督训练框架是 SimCLR，\href{http://proceedings.mlr.press/v119/chen20j/chen20j.pdf}{详见以下论文}。
+本项目的自监督训练框架是 SimCLR, \href{http://proceedings.mlr.press/v119/chen20j/chen20j.pdf}{详见以下论文}.
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.6]{simclr.png}
     \caption{SimCLR 架构}
     % \label{fig:fine}
 \end{figure}
-SimCLR 是一种用于自监督学习的框架，旨在学习高质量的视觉表示。其核心思想是通过对比学习来最大化正样本对之间的相似度，并最小化负样本对之间的相似度。SimCLR架构主要包括以下几个关键步骤：
+SimCLR 是一种用于自监督学习的框架, 旨在学习高质量的视觉表示. 其核心思想是通过对比学习来最大化正样本对之间的相似度, 并最小化负样本对之间的相似度. SimCLR架构主要包括以下几个关键步骤：
 \begin{enumerate}
-\item 数据增强：SimCLR对每张输入图像应用一系列随机的数据增强操作（如裁剪、旋转、颜色抖动等），生成两种不同的视图。这些视图构成正样本对，而来自不同图像的视图构成负样本对。
+\item 数据增强：SimCLR对每张输入图像应用一系列随机的数据增强操作（如裁剪、旋转、颜色抖动等）, 生成两种不同的视图. 这些视图构成正样本对, 而来自不同图像的视图构成负样本对.
 
-\item 编码器：使用深度神经网络（通常是ResNet）作为编码器，将每个增强后的图像视图映射到一个低维特征空间中。编码器的输出是一个固定长度的特征向量。
+\item 编码器：使用深度神经网络（通常是ResNet）作为编码器, 将每个增强后的图像视图映射到一个低维特征空间中. 编码器的输出是一个固定长度的特征向量.
 
-\item 投影头（Projection Head）：为了计算对比损失，SimCLR在编码器之后引入了一个小型的 MLP 投影头，将编码器的输出特征向量进一步映射到另一个特征空间中。这个步骤有助于学习更好的表示。
+\item 投影头（Projection Head）：为了计算对比损失, SimCLR在编码器之后引入了一个小型的 MLP 投影头, 将编码器的输出特征向量进一步映射到另一个特征空间中. 这个步骤有助于学习更好的表示.
 
-\item 对比损失（Contrastive Loss）：SimCLR使用一种称为 NT-Xent（Normalized Temperature-scaled Cross Entropy）对比损失函数。对于每对正样本对，损失函数鼓励它们在特征空间中彼此接近，同时使负样本对之间的距离尽可能远。
+\item 对比损失（Contrastive Loss）：SimCLR使用一种称为 NT-Xent（Normalized Temperature-scaled Cross Entropy）对比损失函数. 对于每对正样本对, 损失函数鼓励它们在特征空间中彼此接近, 同时使负样本对之间的距离尽可能远.
 \end{enumerate}
 
-整个 SimCLR 框架通过在一个大规模未标注数据集上进行训练，逐步优化编码器和投影头的参数。经过训练后，编码器能够提取有用的图像特征，这些特征可以用于下游任务（如分类、检测等）。
+整个 SimCLR 框架通过在一个大规模未标注数据集上进行训练, 逐步优化编码器和投影头的参数. 经过训练后, 编码器能够提取有用的图像特征, 这些特征可以用于下游任务（如分类、检测等）.
 
-SimCLR的一个显著优点是它仅依赖于数据增强和对比学习，无需任何人工标注的数据，从而有效利用大量未标注的数据进行训练。通过学习更加通用的特征表示，SimCLR 在许多视觉任务中表现出色，并成为自监督学习领域的重要方法之一。
+SimCLR的一个显著优点是它仅依赖于数据增强和对比学习, 无需任何人工标注的数据, 从而有效利用大量未标注的数据进行训练. 通过学习更加通用的特征表示, SimCLR 在许多视觉任务中表现出色, 并成为自监督学习领域的重要方法之一.
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.6]{simclr_code.png}
@@ -194,34 +193,32 @@ SimCLR的一个显著优点是它仅依赖于数据增强和对比学习，无�
     % \label{fig:fine}
 \end{figure}
 
-\subsection{实验设置}
-\subsubsection{数据集}
-在本次期末作业的实验中，我们选择了 CIFAR-10 数据集和 STL-10 数据集来预训练 ResNet18，并在预训练好的 ResNet18 后加入二层 MLP 分类头，并在 CIFAR-100 数据集上进行了微调.
+\subsection{数据集}
+在本次期末作业的实验中, 我们选择了 CIFAR-10 数据集和 STL-10 数据集来预训练 ResNet18, 并在预训练好的 ResNet18 后加入二层 MLP 分类头, 并在 CIFAR-100 数据集上进行了微调.
 
-\subsubsection{优化器和超参数}
-本次实验使用 AdamW 做为优化器，学习率为 $0.0003$，设置批次大小为 512. 在 CIFAR10 数据集上，我们预训练了 90 个 epochs，在 STL10 数据集上，我们预训练了 70 个 epochs，得到了两个版本的 ResNet18.
+\subsection{优化器和超参数}
+本次实验使用 AdamW 做为优化器, 学习率为 $0.0003$, 设置批次大小为 512. 在 CIFAR10 数据集上, 我们预训练了 90 个 epochs, 在 STL10 数据集上, 我们预训练了 70 个 epochs, 得到了两个版本的 ResNet18.
 
-在训练中，我们的温度参数设置为 0.07，特征投射头的维度为 128.
+在训练中, 我们的温度参数设置为 0.07, 特征投射头的维度为 128.
 
-\subsubsection{数据增强}
-在本次实验中，我们选择了和论文中相同的数据增强方法来生成正样本对，我们对图像按照以下顺序进行数据增强：对图像进行随机裁剪：对图像进行随机裁剪、对图像进行随机色彩失真，对图像进行高斯模糊.
+\subsection{数据增强}
+在本次实验中, 我们选择了和论文中相同的数据增强方法来生成正样本对, 我们对图像按照以下顺序进行数据增强：对图像进行随机裁剪：对图像进行随机裁剪、对图像进行随机色彩失真, 对图像进行高斯模糊.
 
 
 \section{实验结果}
 \subsection{数据分析}
 
-我们比较了几组 ResNet18 在 CIFAR100 分类任务上的性能，详见下图：
-
-\begin{figure}[htpb!]
+我们比较了几组 ResNet18 在下游 CIFAR100 分类任务上的性能. 以下是准确率曲线, 四条曲线由上到下分别是在 \textcolor{orange}{ImageNet 上预训练}的 ResNet18, 在 \textcolor{red}{CIFAR10 上使用 SimCLR 预训练}的 ResNet18, 在 \textcolor{green}{STL10 上 使用 SimCLR 预训练}的 ResNet18 和\textcolor{purple}{随机初始化}的 ResNet18. 可以看到, 预训练的模型在分类任务上微调时很快收敛, 详见下图：
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{finetune_accuracy.png}
-    \caption{不同预训练策略下的ResNet18在分裂任务上的性能比较}
+    \caption{不同预训练策略下的ResNet18在分类任务上的性能比较}
     \label{finetune_accuracy}
 \end{figure}
 
-上图的四个 ResNet18 曲线由上到下分别是在 ImageNet 上预训练的 ResNet18，在 CIFAR10 上使用 SImCLR 预训练的 ResNet18，在 STL10 上 使用 SImCLR 预训练的 ResNet18 和随机初始化的 ResNet18. 可以看到，预训练的模型在分类任务上微调时很快收敛，下图是微调的 loss 曲线：
+下图是四个模型的微调损失函数曲线, 由下到上分别是在 \textcolor{orange}{ImageNet 上预训练}的 ResNet18, 在 \textcolor{red}{CIFAR10 上使用 SimCLR 预训练}的 ResNet18, 在 \textcolor{green}{STL10 上 使用 SimCLR 预训练}的 ResNet18 和\textcolor{purple}{随机初始化}的 ResNet18.：
 
-\begin{figure}[htpb!]
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{fine-tune_loss.png}
     \caption{微调任务的损失函数曲线}
@@ -230,12 +227,12 @@ SimCLR的一个显著优点是它仅依赖于数据增强和对比学习，无�
 
 \subsection{结论}
 
-通过以上实验，我们发现使用自监督训练方法预训练得到的 ResNet18 相比于随机初始化的 ResNet18 在具体任务微调上具有更为显著的优势. 
+通过以上实验, 我们发现使用自监督训练方法预训练得到的 ResNet18 相比于随机初始化的 ResNet18 在具体任务微调上具有更为显著的优势.
 
-但同时，并非是预训练数据集越大越好，STL10 的数据集体量远大于 CIFAR10，但两个预训练得到的模型在 CIFAR100 分类任务上表现接近，甚至 CIFAR10 预训练得到的模型在某些 epochs 的评测中效果要好于 STL10，推测有以下两个可能的原因：
+但同时, 并非是预训练数据集越大越好, STL10 的数据集体量远大于 CIFAR10, 但两个预训练得到的模型在 CIFAR100 分类任务上表现接近, 甚至 CIFAR10 预训练得到的模型在某些 epochs 的评测中效果要好于 STL10, 推测有以下两个可能的原因：
 
 \begin{enumerate}
-    \item SimCLR 的特征投射头设置较小，CIFAR10 的数据量已经达到模型承载极限.
+    \item SimCLR 的特征投射头设置较小, CIFAR10 的数据量已经达到模型承载极限.
     \item SimCLR 损失函数存在优化空间.
 \end{enumerate}
 
@@ -243,34 +240,34 @@ SimCLR的一个显著优点是它仅依赖于数据增强和对比学习，无�
 \section{任务描述}
 \begin{enumerate}
 \item 分别基于 CNN 和 Transformer 架构实现具有相近参数量的图像分类网络；
-\item 在 CIFAR-100 数据集上采用相同的训练策略对二者进行训练，其中数据增强策略中应包含 CutMix；
-\item 尝试不同的超参数组合，尽可能提升各架构在CIFAR-100上的性能以进行合理的比较。
+\item 在 CIFAR-100 数据集上采用相同的训练策略对二者进行训练, 其中数据增强策略中应包含 CutMix；
+\item 尝试不同的超参数组合, 尽可能提升各架构在CIFAR-100上的性能以进行合理的比较.
 \end{enumerate}
 
 \section{项目架构}
-此任务的所有文件在\texttt{task2\_Transformer\_vs\_CNN}文件夹中，其中包含以下文件：
+此任务的所有文件在\texttt{task2\_Transformer\_vs\_CNN}文件夹中, 其中包含以下文件：
 \begin{enumerate}
-\item \texttt{data\_preparation.py}文件：包含数据下载函数与预处理函数，其中包含 Cutmix 的实现.
+\item \texttt{data\_preparation.py}文件：包含数据下载函数与预处理函数, 其中包含 Cutmix 的实现.
 \item \texttt{model.py}文件：包含 Resnet 和 ViT 的模型构造函数.
 \item \texttt{training.py}文件：包含训练和超参数调优函数.
-\item \texttt{test\_notebook.ipynb}文件：包含 Transformer 架构和 CNN 架构的对比任务的全部流程，如数据加载、调参和训练可视化.
-\item \texttt{para\_count.py}文件：精细统计模型每一层的参数量。
+\item \texttt{test\_notebook.ipynb}文件：包含 Transformer 架构和 CNN 架构的对比任务的全部流程, 如数据加载、调参和训练可视化.
+\item \texttt{para\_count.py}文件：精细统计模型每一层的参数量.
 \end{enumerate}
 
 \section{实验设置}
 \subsection{数据增广}
-此项目的数据增广在常规图像变化的基础上增加了 Cutmix 增强方法。\href{http://openaccess.thecvf.com/content_ICCV_2019/papers/Yun_CutMix_Regularization_Strategy_to_Train_Strong_Classifiers_With_Localizable_Features_ICCV_2019_paper.pdf}{详见以下论文}。
+此项目的数据增广在常规图像变化的基础上增加了 Cutmix 增强方法. \href{http://openaccess.thecvf.com/content_ICCV_2019/papers/Yun_CutMix_Regularization_Strategy_to_Train_Strong_Classifiers_With_Localizable_Features_ICCV_2019_paper.pdf}{详见以下论文}.
 
-CutMix是一种数据增强技术，旨在提升网络的泛化性能。CutMix的主要思想是在训练图像之间剪切并粘贴图像块，同时按比例混合相应的标签。此方法有助于模型从更多样化的训练样本中学习，从而提高其鲁棒性和性能。
+CutMix是一种数据增强技术, 旨在提升网络的泛化性能. CutMix的主要思想是在训练图像之间剪切并粘贴图像块, 同时按比例混合相应的标签. 此方法有助于模型从更多样化的训练样本中学习, 从而提高其鲁棒性和性能.
 
-CutMix的原理包括两个主要步骤：从一张图像中剪切出一个块并将其粘贴到另一张图像上，然后按比例调整两张图像的标签。具体来说，对于两张图像 $x_A$ 和 $x_B$ 及其对应的标签 $y_A$ 和 $y_B$，新的图像 $\tilde{x}$ 和标签 $\tilde{y}$ 的生成方式如下：
+CutMix的原理包括两个主要步骤：从一张图像中剪切出一个块并将其粘贴到另一张图像上, 然后按比例调整两张图像的标签. 具体来说, 对于两张图像 $x_A$ 和 $x_B$ 及其对应的标签 $y_A$ 和 $y_B$, 新的图像 $\tilde{x}$ 和标签 $\tilde{y}$ 的生成方式如下：
 \begin{equation}
 \tilde{x} = M \odot x_A + (1 - M) \odot x_B
 \end{equation}
 \begin{equation}
 \tilde{y} = \lambda y_A + (1 - \lambda) y_B
 \end{equation}
-其中，$M$ 是一个二进制掩码，表示图像块的应用位置，$\odot$ 表示元素级乘法，$\lambda \in [0, 1]$ 是表示原始图像保留比例的随机变量，通常从Beta分布中采样。
+其中, $M$ 是一个二进制掩码, 表示图像块的应用位置, $\odot$ 表示元素级乘法, $\lambda \in [0, 1]$ 是表示原始图像保留比例的随机变量, 通常从Beta分布中采样.
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.7]{cutmix.png}
@@ -280,73 +277,73 @@ CutMix的原理包括两个主要步骤：从一张图像中剪切出一个块�
 
 CutMix已被证明能通过以下几方面增强深度学习模型的性能：
 \begin{itemize}
-    \item 提高泛化性能：通过使模型暴露于更广泛的图像变体，CutMix有助于防止过拟合，从而提高在未见数据上的泛化性能。
-    \item 正则化：该技术类似于dropout，通过引入随机性防止模型过度依赖特定特征，起到正则化的作用。
-    \item 标签平滑：标签混合有助于模型学习更柔和的标签，这对于分类任务中类间界限不明确的情况尤为有益。
+    \item 提高泛化性能：通过使模型暴露于更广泛的图像变体, CutMix有助于防止过拟合, 从而提高在未见数据上的泛化性能.
+    \item 正则化：该技术类似于dropout, 通过引入随机性防止模型过度依赖特定特征, 起到正则化的作用.
+    \item 标签平滑：标签混合有助于模型学习更柔和的标签, 这对于分类任务中类间界限不明确的情况尤为有益.
 \end{itemize}
-实验证明，与传统的数据增强技术相比，使用CutMix训练的模型在准确率和对抗攻击的鲁棒性方面表现更佳。
+实验证明, 与传统的数据增强技术相比, 使用CutMix训练的模型在准确率和对抗攻击的鲁棒性方面表现更佳.
 
 CutMix的实现包括以下步骤：
 \begin{enumerate}
-    \item 随机选择两张图像：从训练集中选择两张图像 $x_A$ 和 $x_B$ 及其对应的标签 $y_A$ 和 $y_B$。
-    \item 生成二进制掩码：通过在第一张图像中选择一个随机矩形区域，并将该区域对应的第二张图像的部分设为零，创建一个二进制掩码 $M$。
-    \item 应用CutMix：使用二进制掩码组合两张图像，创建新的训练样本。根据掩码区域的面积按比例调整标签。
-    \item 更新训练数据：使用新的图像和标签作为训练过程的一部分。
+    \item 随机选择两张图像：从训练集中选择两张图像 $x_A$ 和 $x_B$ 及其对应的标签 $y_A$ 和 $y_B$.
+    \item 生成二进制掩码：通过在第一张图像中选择一个随机矩形区域, 并将该区域对应的第二张图像的部分设为零, 创建一个二进制掩码 $M$.
+    \item 应用CutMix：使用二进制掩码组合两张图像, 创建新的训练样本. 根据掩码区域的面积按比例调整标签.
+    \item 更新训练数据：使用新的图像和标签作为训练过程的一部分.
 \end{enumerate}
 
-在本项目的实现中，函数 \texttt{rand\_bbox} 用于生成随机边界框，而 \texttt{cutmix} 函数则将 CutMix 增强应用于一批图像。在训练函数每次载入小批量数据时，我们调用\texttt{cutmix} 函数。
+在本项目的实现中, 函数 \texttt{rand\_bbox} 用于生成随机边界框, 而 \texttt{cutmix} 函数则将 CutMix 增强应用于一批图像. 在训练函数每次载入小批量数据时, 我们调用\texttt{cutmix} 函数.
 
 
 \subsection{模型选择}
-本项目采用的CNN架构是 resnet 架构，具体采用了 resnet18 架构，也可以改为更大的 resnet 架构。
+本项目采用的CNN架构是 resnet 架构, 具体采用了 resnet18 架构, 也可以改为更大的 resnet 架构.
 
-本项目采用的 Transformer 架构是经典的 ViT(Vision Transformer) 架构。\href{https://arxiv.org/pdf/2010.11929.pdf?fbclid=IwAR1NafJDhZjkARvCswpV6kS9_hMa0ycvzwhlCb7cqAGwgzComFXcScxgA8o}{详见以下论文}：
+本项目采用的 Transformer 架构是经典的 ViT(Vision Transformer) 架构. \href{https://arxiv.org/pdf/2010.11929.pdf?fbclid=IwAR1NafJDhZjkARvCswpV6kS9_hMa0ycvzwhlCb7cqAGwgzComFXcScxgA8o}{详见以下论文}：
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.55]{ViT.png}
     \caption{ViT 架构}
     % \label{fig:fine}
 \end{figure}
-ViT 是一种将 Transformer 应用于图像分类任务的新型架构。Transformer 最初在自然语言处理（NLP）任务中取得了巨大成功，ViT则将其应用于计算机视觉领域，通过将图像划分为一系列图像块（patch），并将这些图像块视为序列数据进行处理。ViT 在许多图像分类任务上表现出色，特别是在大型数据集上。
+ViT 是一种将 Transformer 应用于图像分类任务的新型架构. Transformer 最初在自然语言处理（NLP）任务中取得了巨大成功, ViT则将其应用于计算机视觉领域, 通过将图像划分为一系列图像块（patch）, 并将这些图像块视为序列数据进行处理. ViT 在许多图像分类任务上表现出色, 特别是在大型数据集上.
 
-ViT 的核心思想是将图像分割成固定大小的图像块，然后将这些图像块展平并嵌入到更高维度的向量空间中。每个图像块通过线性变换被映射为一个特征向量，这些特征向量连同位置编码一起作为 Transformer 编码器的输入。
+ViT 的核心思想是将图像分割成固定大小的图像块, 然后将这些图像块展平并嵌入到更高维度的向量空间中. 每个图像块通过线性变换被映射为一个特征向量, 这些特征向量连同位置编码一起作为 Transformer 编码器的输入.
 
 具体步骤如下：
 \begin{enumerate}
-    \item 图像分割：将输入图像 $x \in \mathbb{R}^{H \times W \times C}$ 划分为 $N$ 个不重叠的图像块，每个图像块的大小为 $P \times P$，因此 $N = \frac{HW}{P^2}$。
-    \item 图像块展平和嵌入：将每个图像块展平并通过线性变换映射到$d$维特征向量，得到 $z_0 \in \mathbb{R}^{N \times d}$。
-    \item 位置编码：为每个图像块添加位置编码，以保留空间位置信息，位置编码与特征向量相加形成最终输入 $z_0 + E_{pos}$。
-    \item Transformer 编码器：将上述输入序列传递给标准的 Transformer 编码器，编码器由多层自注意力机制和前馈神经网络组成。
-    \item 分类：使用分类标记（class token）作为输入序列的一部分，通过 Transformer 编码器的输出进行图像分类。
+    \item 图像分割：将输入图像 $x \in \mathbb{R}^{H \times W \times C}$ 划分为 $N$ 个不重叠的图像块, 每个图像块的大小为 $P \times P$, 因此 $N = \frac{HW}{P^2}$.
+    \item 图像块展平和嵌入：将每个图像块展平并通过线性变换映射到$d$维特征向量, 得到 $z_0 \in \mathbb{R}^{N \times d}$.
+    \item 位置编码：为每个图像块添加位置编码, 以保留空间位置信息, 位置编码与特征向量相加形成最终输入 $z_0 + E_{pos}$.
+    \item Transformer 编码器：将上述输入序列传递给标准的 Transformer 编码器, 编码器由多层自注意力机制和前馈神经网络组成.
+    \item 分类：使用分类标记（class token）作为输入序列的一部分, 通过 Transformer 编码器的输出进行图像分类.
 \end{enumerate}
-ViT 在大型数据集上的表现优异，并且在参数数量相近的情况下，能够比传统卷积神经网络取得更好的性能。其主要优势包括：
+ViT 在大型数据集上的表现优异, 并且在参数数量相近的情况下, 能够比传统卷积神经网络取得更好的性能. 其主要优势包括：
 \begin{itemize}
-    \item 灵活性：ViT 能够处理不同分辨率和大小的图像，只需调整图像块的大小即可。
-    \item 全局信息：自注意力机制能够捕捉图像中的全局信息，而不是局限于局部感受野。
-    \item 可扩展性：ViT 能够轻松扩展到更大的模型尺寸和更多的参数，从而进一步提高性能。
+    \item 灵活性：ViT 能够处理不同分辨率和大小的图像, 只需调整图像块的大小即可.
+    \item 全局信息：自注意力机制能够捕捉图像中的全局信息, 而不是局限于局部感受野.
+    \item 可扩展性：ViT 能够轻松扩展到更大的模型尺寸和更多的参数, 从而进一步提高性能.
 \end{itemize}
-然而，ViT的一个主要挑战是在小型数据集上容易过拟合，因此在使用 ViT 时，通常需要预训练模型或更强的数据增强技术（如 Cutmix）。
+然而, ViT的一个主要挑战是在小型数据集上容易过拟合, 因此在使用 ViT 时, 通常需要预训练模型或更强的数据增强技术（如 Cutmix）.
 
 \subsection{模型参数量估计}
-ResNet的分类头输出维数是100，resnet18模型的参数量统计为：11227812。
+ResNet的分类头输出维数是100, resnet18模型的参数量统计为：11227812.
 
-在我们的 ViT 模型中，\texttt{image\_size=32} 表示输入图像的尺寸为 32x32 像素；\texttt{patch\_size=4} 表示将图像划分为 4x4 像素的 patch，因此一个 32x32 的图像将被划分为 64 个 patch；\texttt{num\_classes=100} 表示模型需要进行100类分类；\texttt{dim=192}表示每个patch嵌入到一个192维的向量空间；\texttt{depth=25}表示模型包含25层Transformer编码器块；\texttt{heads=6}表示每个自注意力层包含6个独立的注意力头；\texttt{mlp\_dim=384}表示前馈神经网络的隐藏层维度为384。ViT 模型的参数统计为：11139844.
+在我们的 ViT 模型中, \texttt{image\_size=32} 表示输入图像的尺寸为 32x32 像素；\texttt{patch\_size=4} 表示将图像划分为 4x4 像素的 patch, 因此一个 32x32 的图像将被划分为 64 个 patch；\texttt{num\_classes=100} 表示模型需要进行100类分类；\texttt{dim=192}表示每个patch嵌入到一个192维的向量空间；\texttt{depth=25}表示模型包含25层Transformer编码器块；\texttt{heads=6}表示每个自注意力层包含6个独立的注意力头；\texttt{mlp\_dim=384}表示前馈神经网络的隐藏层维度为384. ViT 模型的参数统计为：11139844.
 
-更细致的统计见附录A。
+更细致的统计见附录A.
 
 \subsection{优化器设置}
-两种架构的优化器都选择 Adam 优化器。除学习率和权重衰退以外，其余参数都为默认参数。
+两种架构的优化器都选择 Adam 优化器. 除学习率和权重衰退以外, 其余参数都为默认参数.
 
 
 \section{调参结果}
 本实验调节两个参数以尽可能提高模型性能：学习率 \texttt{lr} 和权重衰退 \texttt{weight\_decay}.
 
-经过多轮调参，最终确定 resnet18 的 \texttt{lr} 为1e-3，\texttt{weight\_decay} 为0. ViT 的 \texttt{lr} 为4e-4，\texttt{weight\_decay} 为1e-5.
+经过多轮调参, 最终确定 resnet18 的 \texttt{lr} 为1e-3, \texttt{weight\_decay} 为0. ViT 的 \texttt{lr} 为4e-4, \texttt{weight\_decay} 为1e-5.
 
 
 \section{实验结果}
 \subsection{数据分析}
-以下图片中，\textcolor{orange}{橙线}都是 \textcolor{orange}{resnet18 网络}的数据曲线，\textcolor{blue}{蓝线}都是 \textcolor{blue}{ViT 网络}的数据曲线.
+以下图片中, \textcolor{orange}{橙线}都是 \textcolor{orange}{resnet18 网络}的数据曲线, \textcolor{blue}{蓝线}都是 \textcolor{blue}{ViT 网络}的数据曲线.
 
 \begin{figure}[H]
     \centering
@@ -354,21 +351,21 @@ ResNet的分类头输出维数是100，resnet18模型的参数量统计为：112
     \caption{准确率对比}
     % \label{fig:acc}
 \end{figure}
-可以看出两个模型的准确率在训练的过程中不断上升，并且都没有饱和，理论上如果训练更长时间，两者都能获得更好的效果。训练初始阶段 resnet18 性能更好，约30个 epoch 左右被 ViT 超越。resnet18 的最终验证集准确率为57.88\%，ViT的最终验证集准确率为65.53\%.
+可以看出两个模型的准确率在训练的过程中不断上升, 并且都没有饱和, 理论上如果训练更长时间, 两者都能获得更好的效果. 训练初始阶段 resnet18 性能更好, 约30个 epoch 左右被 ViT 超越. resnet18 的最终验证集准确率为57.88\%, ViT的最终验证集准确率为65.53\%.
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.75]{transformer_loss.png}
     \caption{损失函数对比}
     % \label{fig:loss}
 \end{figure}
-两个模型的损失函数值也逐渐下降，初始时 resnet18 下降更快，但随后被 ViT 超越。
+两个模型的损失函数值也逐渐下降, 初始时 resnet18 下降更快, 但随后被 ViT 超越.
 
 
 
 \subsection{结论}
-以上实验结果一定程度上验证了 ViT 原论文中的结论，即 ViT 虽然在较小的数据集上性能不如 CNN 网络，但在更大的数据集上，ViT 的性能可以超越 CNN 架构。在我们的实验中，可以认为训练轮数较少等价于数据集较小，因此随着训练的进行，模型学习的数据量增多，ViT 的性能逐渐超越 resnet18.
+以上实验结果一定程度上验证了 ViT 原论文中的结论, 即 ViT 虽然在较小的数据集上性能不如 CNN 网络, 但在更大的数据集上, ViT 的性能可以超越 CNN 架构. 在我们的实验中, 可以认为训练轮数较少等价于数据集较小, 因此随着训练的进行, 模型学习的数据量增多, ViT 的性能逐渐超越 resnet18.
 
-以下是 ViT 原论文中两种模型的性能对比，其中 BiT 是一种基于CNN的模型架构，灰色区域是其架构的性能范围，随着数据量的增加，ViT 的性能增加比BiT更多。
+以下是 ViT 原论文中两种模型的性能对比, 其中 BiT 是一种基于CNN的模型架构, 灰色区域是其架构的性能范围, 随着数据量的增加, ViT 的性能增加比BiT更多.
 
 \begin{figure}[H]
     \centering
@@ -377,49 +374,107 @@ ResNet的分类头输出维数是100，resnet18模型的参数量统计为：112
     % \label{fig:loss}
 \end{figure}
 
-ViT 由于其较复杂的结构，在小数据集和短期训练中容易过拟合，导致其性能不如 resnet18。但随着训练数据量的增加，ViT 能够更好地利用其全局注意力机制，捕捉数据中的长距离依赖关系，从而逐渐提升其性能。在相同训练策略下，ViT 需要更多的训练时间和数据量来展现其优势。因此，在实际应用中，为了充分发挥 ViT 的潜力，通常需要结合大规模数据集或进行预训练。对于数据量有限的任务，resnet18 等传统 CNN 架构依然是有效的选择。而对于数据量充足的任务，ViT 则展现出更强的性能和泛化能力。
+ViT 由于其较复杂的结构, 在小数据集和短期训练中容易过拟合, 导致其性能不如 resnet18. 但随着训练数据量的增加, ViT 能够更好地利用其全局注意力机制, 捕捉数据中的长距离依赖关系, 从而逐渐提升其性能. 在相同训练策略下, ViT 需要更多的训练时间和数据量来展现其优势. 因此, 在实际应用中, 为了充分发挥 ViT 的潜力, 通常需要结合大规模数据集或进行预训练. 对于数据量有限的任务, resnet18 等传统 CNN 架构依然是有效的选择. 而对于数据量充足的任务, ViT 则展现出更强的性能和泛化能力.
 
-\chapter{基于 NeRF 的物体重建和新视图合成3}
+\chapter{基于 NeRF 的物体重建和新视图合成}
 \section{任务描述}
 \begin{enumerate}
-\item 选取身边的物体拍摄多角度图片/视频，并使用COLMAP估计相机参数，随后使用现成的框架进行训练；
-\item 基于训练好的NeRF渲染环绕物体的视频，并在预留的测试图片上评价定量结果。
+\item 选取身边的物体拍摄多角度图片/视频, 并使用COLMAP估计相机参数, 随后使用现成的框架进行训练；
+\item 基于训练好的NeRF渲染环绕物体的视频, 并在预留的测试图片上评价定量结果.
 \end{enumerate}
 
 \section{项目架构}
-本次实验使用 nerfstudio 完成了工程部分，选择的模型是 nerfacto，是 nerfstudio 的默认选项，关于模型和 nerfstudio 的架构细节，详见\href{https://arxiv.org/pdf/2302.04264}{此论文}.
+本次实验使用 nerfstudio 完成了工程部分, 选择的模型是 nerfacto, 是 nerfstudio 的默认选项, 关于模型和 nerfstudio 的架构细节, 详见\href{https://arxiv.org/pdf/2302.04264}{此论文}.
 
-本次实验使用了一段 67s 的视频做为训练数据集，COLMAP 将视频划分为了 335 帧，其中 90\% 的数据被用作模型的训练，10\% 的数据被用作模型的测试.
+本次实验使用了一段 67s 的视频做为训练数据集, COLMAP 将视频划分为了 335 帧, 其中 90\% 的数据被用作模型的训练, 10\% 的数据被用作模型的测试.
+
+\section{NeRF 介绍}
+NeRF（Neural Radiance Fields）是一种使用神经网络来表示三维场景的技术. 其核心思想是通过输入空间位置和视角方向, 利用神经网络预测该位置的颜色和体积密度. NeRF的主要原理包括以下几个方面：
+\subsection{体积渲染}
+体积渲染是NeRF的基础, 通过对三维空间中的点进行采样来生成图像. 具体步骤如下：
+\begin{enumerate}
+    \item 对每条摄像机射线（ray）进行均匀采样, 得到多个三维采样点.
+    \item 对每个采样点, 输入其空间坐标和视角方向到神经网络中, 预测该点的颜色和密度.
+    \item 通过体积渲染方程, 结合所有采样点的颜色和密度, 计算出该射线对应的像素颜色.
+\end{enumerate}
+\subsection{网络架构}
+NeRF的神经网络通常是一个多层感知器（MLP）, 其输入是空间坐标和视角方向, 输出是颜色和体积密度. 网络架构的细节如下：
+\begin{itemize}
+    \item 输入: 三维坐标 $\mathbf{x} = (x, y, z)$ 和视角方向 $\mathbf{d} = (d_x, d_y, d_z)$.
+    \item 输出: 体积密度 $\sigma$ 和颜色 $\mathbf{c} = (r, g, b)$.
+    \item 网络层数: 通常包含8层, 每层包含256个神经元, 使用ReLU激活函数.
+    \item 跳跃连接: 在中间层添加跳跃连接, 以保留高频信息.
+\end{itemize}
+\subsection{优化}
+NeRF通过优化网络参数, 使得合成图像与真实图像之间的误差最小.
+
+使用NeRF进行三维重建的流程包括数据准备、网络初始化、训练和渲染. 具体步骤如下：
+\subsection{数据准备}
+为了训练NeRF模型, 需要多视角的图像数据和相机参数. 数据准备过程如下：
+\begin{enumerate}
+    \item 收集多视角图像：从不同视角拍摄目标场景的图像, 确保覆盖足够的视角范围.
+    \item 获取相机参数：记录每张图像对应的相机位置和方向, 通常使用相机标定技术获取这些参数.
+\end{enumerate}
+
+\subsection{网络初始化}
+初始化NeRF模型, 包括网络参数和优化器. 具体步骤如下：
+\begin{enumerate}
+    \item 定义网络结构：根据NeRF的架构定义MLP模型.
+    \item 初始化参数：随机初始化网络参数.
+    \item 配置优化器：通常使用Adam优化器, 并设置学习率等超参数.
+\end{enumerate}
+
+\subsection{训练}
+训练NeRF模型, 使其能够准确预测三维场景中的颜色和密度. 训练过程如下：
+\begin{enumerate}
+    \item 射线采样：对于每张图像中的每个像素, 从相机中心沿视线方向采样多条射线.
+    \item 空间采样：对于每条射线, 在其沿途均匀采样多个三维点.
+    \item 颜色和密度预测：将每个采样点的坐标和视角方向输入神经网络, 预测该点的颜色和密度.
+    \item 体积渲染：根据所有采样点的颜色和密度, 通过体积渲染方程计算每条射线的像素颜色.
+    \item 损失计算：计算合成图像与真实图像之间的L2损失.
+    \item 参数更新：通过反向传播和梯度下降算法, 更新网络参数.
+\end{enumerate}
+\subsection{渲染}
+训练完成后, 使用优化后的NeRF模型生成新视角的图像. 渲染过程如下：
+\begin{enumerate}
+    \item 定义视角：选择新视角的相机位置和方向.
+    \item 射线采样：从新视角的相机位置沿视线方向采样射线.
+    \item 空间采样：在每条射线上均匀采样多个三维点.
+    \item 颜色和密度预测：将每个采样点的坐标和视角方向输入神经网络, 预测该点的颜色和密度.
+    \item 体积渲染：根据所有采样点的颜色和密度, 通过体积渲染方程计算每条射线的像素颜色, 生成新视角的图像.
+\end{enumerate}
+
+NeRF通过神经网络有效地表示三维场景中的颜色和密度, 结合体积渲染技术, 实现了高质量的三维重建. 这种方法不仅在保留细节方面表现出色, 而且在计算机视觉和图形学领域得到了广泛应用.
+
 
 
 \section{实验设置}
-本次实验借助了架构 Nerf Studio，此框架提供了一键式训练一些现有 nerf 模型的环境. 实验的主要设置为：
+本次实验借助了架构 Nerf Studio, 此框架提供了一键式训练一些现有 nerf 模型的环境. 实验的主要设置为：
 \begin{enumerate}
-    \item 优化器：采用 Adam 优化器，NeRF 的训练有三部分：相机参数优化、场和建议网络，这几部分的学习率中，后两个的学习率我们使得其线性下降，第一个学习率我们令其以 $t^{-1}$ 的速度下降，最低为 $1\times 10^{-4}$.
+    \item 优化器：采用 Adam 优化器, NeRF 的训练有三部分：相机参数优化、场和建议网络, 这几部分的学习率中, 后两个的学习率我们使得其线性下降, 第一个学习率我们令其以 $t^{-1}$ 的速度下降, 最低为 $1\times 10^{-4}$.
 
-    \item 我们训练了 100 个 epoch，每个 epoch 都使用了 4096 的 batch size，每 500 次迭代之后评估一张测试集的图片，25000 个迭代之后评估所有图片.
+    \item 我们训练了 100 个 epoch, 每个 epoch 都使用了 4096 的 batch size, 每 500 次迭代之后评估一张测试集的图片, 25000 个迭代之后评估所有图片.
 \end{enumerate}
 
 
 \section{实验结果}
 本次实验的训练损失函数和测试集上的损失函数见下图：
-\begin{figure}[htpb!]
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{nerfloss.png}
     \caption{NeRFacto 训练损失函数}
     \label{fig:enter-label}
 \end{figure}
 
-\begin{figure}[htpb!]
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{eval_loss.png}
     \caption{NeRFacto 测试损失函数}
     \label{fig:enter-label}
 \end{figure}
 
-同时，我们还输出了在测试图像上的 PSNR，见下图：
-
-\begin{figure}
+同时, 我们还输出了在测试图像上的 PSNR, 见下图：
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{psnr.png}
     \caption{测试图片上的 PSNR}
@@ -428,11 +483,11 @@ ViT 由于其较复杂的结构，在小数据集和短期训练中容易过拟�
 
 \subsection{结果的可视化}
 
-我们使用 NeRF 训练的结果重建了 3D 点云，并渲染了环绕物体的视频.
+我们使用 NeRF 训练的结果重建了 3D 点云, 并渲染了环绕物体的视频.
 
-我们选取的物体是一个可回收垃圾桶，其放置的环境在光华楼东主楼 14 楼的电梯间，3D点云重建的效果如下：
+我们选取的物体是一个可回收垃圾桶, 其放置的环境在光华楼东主楼 14 楼的电梯间, 3D点云重建的效果如下：
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{3drecon.png}
     \caption{3D 重建的可视化}
@@ -444,7 +499,7 @@ ViT 由于其较复杂的结构，在小数据集和短期训练中容易过拟�
 % 附录开始
 \begin{appendices}
     \appchapter{A}{ResNet18 和 ViT 的模型参数量精细统计}
-可以运行\texttt{task2\_Transformer\_vs\_CNN}文件夹中的\texttt{para\_count.py}文件来统计模型参数。以下是统计结果：
+可以运行\texttt{task2\_Transformer\_vs\_CNN}文件夹中的\texttt{para\_count.py}文件来统计模型参数. 以下是统计结果：
 \small{
 \begin{lstlisting}[style=output]
 ResNet-18 Architecture and Parameters:

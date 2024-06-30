@@ -4,14 +4,14 @@ from torchvision.models import ResNet18_Weights, AlexNet_Weights
 
 def initialize_model(model_name, num_classes, use_pretrained=True):
     """
-    初始化一个给定类别数量的模型，并可选择是否使用预训练权重。
+    初始化一个给定类别数量的模型, 并可选择是否使用预训练权重.
     参数:
-        model_name (str): 要初始化的模型名称。
-        num_classes (int): 输出类别的数量。
-        use_pretrained (bool): 是否使用预训练的模型权重。
+        model_name (str): 要初始化的模型名称.
+        num_classes (int): 输出类别的数量.
+        use_pretrained (bool): 是否使用预训练的模型权重.
     返回:
-        model (torch.nn.Module): 初始化后的模型。
-        input_size (int): 模型需要的输入图像尺寸。
+        model (torch.nn.Module): 初始化后的模型.
+        input_size (int): 模型需要的输入图像尺寸.
     """
 
     model = None  # 初始化模型变量
@@ -35,7 +35,7 @@ def initialize_model(model_name, num_classes, use_pretrained=True):
         input_size = 224  # AlexNet需要的输入尺寸为224x224
 
     else:
-        print("Invalid model name, exiting...")  # 如果模型名称无效，则打印错误信息并退出
+        print("Invalid model name, exiting...")  # 如果模型名称无效, 则打印错误信息并退出
         exit()
 
     return model, input_size  # 返回初始化的模型和输入尺寸

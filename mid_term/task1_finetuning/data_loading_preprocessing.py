@@ -10,10 +10,10 @@ import pandas as pd
 
 def download_dataset(url, data_dir):
     """
-    下载并解压数据集。如果数据集的.tgz文件尚未存在，则进行下载和解压。
+    下载并解压数据集. 如果数据集的.tgz文件尚未存在, 则进行下载和解压.
     参数:
-        url (str): 数据集下载链接。
-        data_dir (str): 数据存放目录。
+        url (str): 数据集下载链接.
+        data_dir (str): 数据存放目录.
     """
     tgz_path = os.path.join(data_dir, 'CUB_200_2011.tgz')
     if not os.path.exists(tgz_path):
@@ -33,7 +33,7 @@ def download_dataset(url, data_dir):
             progress_bar.close()
 
             if os.path.getsize(tgz_path) != total_size_in_bytes:
-                raise Exception("下载文件大小与预期不符。")
+                raise Exception("下载文件大小与预期不符. ")
 
             print("正在解压数据集...")
             with tarfile.open(tgz_path, 'r:gz') as tar_ref:
@@ -42,15 +42,15 @@ def download_dataset(url, data_dir):
             print(f"发生错误：{e}")
             os.remove(tgz_path)  # 删除损坏的文件
     else:
-        print("数据集已存在，无需再次下载。")
+        print("数据集已存在, 无需再次下载. ")
 
 def create_filename_to_split_mapping(data_dir):
     """
-    根据数据目录创建文件名到训练/验证集划分的映射。
+    根据数据目录创建文件名到训练/验证集划分的映射.
     参数:
-        data_dir (str): 数据集的目录。
+        data_dir (str): 数据集的目录.
     返回:
-        dict: 包含文件路径与数据集划分（训练/验证）的映射。
+        dict: 包含文件路径与数据集划分（训练/验证）的映射.
     """
     images_path = os.path.join(data_dir, 'CUB_200_2011', 'images.txt')
     split_path = os.path.join(data_dir, 'CUB_200_2011', 'train_test_split.txt')
@@ -84,7 +84,7 @@ train_transform = transforms.Compose([
 def train_collate_fn(batch):
     # 从批次中分别处理图像和标签
     images, labels = zip(*[(train_transform(x), y) for x, y in batch])
-    # 使用 default_collate 来正确处理这些列表，形成批次
+    # 使用 default_collate 来正确处理这些列表, 形成批次
     return default_collate(images), default_collate(labels)
 
 def val_collate_fn(batch):
@@ -93,13 +93,13 @@ def val_collate_fn(batch):
 
 def load_data(data_dir, batch_size, download_url=None):
     """
-    加载并预处理数据集。
+    加载并预处理数据集.
     参数:
-        data_dir (str): 数据集的目录。
-        batch_size (int): 批处理大小。
-        download_url (str, optional): 数据集的下载URL。
+        data_dir (str): 数据集的目录.
+        batch_size (int): 批处理大小.
+        download_url (str, optional): 数据集的下载URL.
     返回:
-        tuple: 包含训练集和验证集的数据加载器。
+        tuple: 包含训练集和验证集的数据加载器.
     """
     if download_url:
         download_dataset(download_url, data_dir)
