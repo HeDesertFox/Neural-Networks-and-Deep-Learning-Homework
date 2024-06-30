@@ -11,11 +11,11 @@ Each folder includes several tasks.
 
 ## Midterm Assignments
 
-### Task1
+### Task 1
 Detailed instructions for the fine-tuning task can be found in the `mid_term/task1_finetuning/main_notebook.ipynb` file. Please follow the instructions and run each cell sequentially.
 
-### Task2
-For object detection task, it requires mmdetection installed, simply
+### Task 2
+For the object detection task, you need to have mmdetection installed. Simply run:
 
 ```
 pip install -U openmim
@@ -30,7 +30,7 @@ pip install -v -e .
 mim install mmdet
 ```
 
-After installing successfully, run the following
+After installing successfully, run the following:
 
 ```
 cd mmdetection
@@ -40,18 +40,20 @@ python tools/train.py \
     [optional arguments]
 ```
 Where the config files are provided in our project.
+
 ## Final Assignments
-### Task1
 
-For pretraining the ResNet18 with SimCLR, follow instruction of `pretraining_notebook.ipynb`, note that user shall manually create some of the folders which doesn't exist.
+### Task 1
 
-### Task2
+For pretraining the ResNet18 with SimCLR, follow the instructions in `pretraining_notebook.ipynb`. Note that you may need to manually create some folders that do not exist.
 
-Detailed instructions for the Transformer-CNN comparing task can be found in the `final/task2_transformer_vs_CNN/test_notebook.ipynb` file. Please follow the instructions and run each cell sequentially.
+### Task 2
 
-### Task3
+Detailed instructions for the Transformer-CNN comparison task can be found in the `final/task2_transformer_vs_CNN/test_notebook.ipynb` file. Please follow the instructions and run each cell sequentially.
 
-For training nerf, it requires NeRFstudio to be installed.
+### Task 3
+
+For training NeRF, you need to have NeRFstudio installed. Run the following commands:
 
 ```
 conda create --name nerfstudio -y python=3.8
@@ -60,17 +62,18 @@ python -m pip install --upgrade pip
 pip uninstall torch torchvision functorch tinycudann
 ```
 
-Note that torch needed to be installed, the version shall be either 2.1.2 or 2.0.1.
+Note that torch needs to be installed, with a version of either 2.1.2 or 2.0.1. Then run:
 
 ```
 conda install -c "nvidia/label/cuda-11.8.0" cuda-toolkit
-```
-```
 pip install ninja git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
 pip install nerfstudio
 ```
 
-Then download the dataset from our provided BaiduNetDisk url and place it at `{DATA_DIR}`, then
-`conda install colmap`
-`ns-process-data {images, video} --data {DATA_PATH} --output-dir {PROCESSED_DATA_DIR}`
-`ns-train nerfacto --data {PROCESSED_DATA_DIR} --vis tensorboard`
+Then download the dataset from our provided BaiduNetDisk URL and place it at `{DATA_DIR}`. After that, run:
+
+```
+conda install colmap
+ns-process-data {images, video} --data {DATA_PATH} --output-dir {PROCESSED_DATA_DIR}
+ns-train nerfacto --data {PROCESSED_DATA_DIR} --vis tensorboard
+```
