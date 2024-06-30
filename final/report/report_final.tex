@@ -157,10 +157,10 @@
 
 \section{项目架构}
 \begin{enumerate}
-    \item \texttt{data\_preparation.py}文件：
-    \item \texttt{model.py}文件：
-    \item \texttt{training.py}文件：
-    \item \texttt{test\_notebook.ipynb}文件：
+    \item \texttt{finetuning\_notebook.ipynb}文件：其中包含下游微调任务；
+    \item \texttt{pretraining\_notebook.ipynb}文件：包含预训练任务；
+    \item \texttt{simclr.py}文件：该文件实现了模型训练的主要流程，以及损失函数;
+    \item \texttt{simclr\_model.py}文件：该文件实现了 SimCLR 的模型
     \end{enumerate}
 
 \section{实验设置}
@@ -485,7 +485,7 @@ NeRF通过神经网络有效地表示三维场景中的颜色和密度, 结合�
 
 我们使用 NeRF 训练的结果重建了 3D 点云, 并渲染了环绕物体的视频.
 
-我们选取的物体是一个可回收垃圾桶, 其放置的环境在光华楼东主楼 14 楼的电梯间, 3D点云重建的效果如下：
+我们选取的物体是一个可回收垃圾桶，其放置的环境在光华楼东主楼 14 楼的电梯间，3D点云重建的效果如下，可以看到图像中是我们的 3D 模型从测上方观测的视角，所有的训练集图片可以在环绕图片的照片标志上观察到. 3D点云重建的效果如下：
 
 \begin{figure}[H]
     \centering
